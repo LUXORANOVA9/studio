@@ -71,6 +71,17 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
                 </div>
             )}
 
+              {/* LuxVerse Link */}
+              {(userRole === 'broker' || userRole === 'admin' || userRole === 'superadmin' || userRole === 'client') && (
+                  <div className="mb-4">
+                      <Link href="/luxverse">
+                          <Button>
+                              Enter LuxVerse
+                          </Button>
+                      </Link>
+                  </div>
+              )}
+
             {children}
         </div>
     );
