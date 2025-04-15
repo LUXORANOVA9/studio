@@ -1,33 +1,23 @@
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-const cors = require('cors')({origin: true});
-const { Configuration, OpenAI } = require("openai");
+const functions = require("firebase-functions");
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
 
-// Initialize OpenAI API
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const { askLUXBot } = require("./luxbot");
+const { getSORAInsight } = require("./sora");
+
+const app = express();
+app.use(cors({ origin: true }));
+app.use(express.json());
+
+app.post("/ask-luxbot", async (req, res) => {
+  const reply = await askLUXBot(req.body.prompt);
+  res.send({ reply });
 });
-const openai = new OpenAI(configuration);
 
-exports.askLUXBot = onRequest(async (request, response) => {
-  cors(request, response, async () => {
-    try {
-      const { prompt } = request.body;
-
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 150,
-        n: 1,
-        stop: null,
-        temperature: 0.7,
-      });
-
-      const luxBotResponse = completion.choices[0].message.content.trim();
-      response.status(200).send({ response: luxBotResponse });
-    } catch (error) {
-      logger.error("Error asking LUXBot:", error);
-      response.status(500).send({ message: "Failed to get response from LUXBot", error: error.message });
-    }
-  });
+app.post("/sora", async (req, res) => {
+  const reply = await getSORAInsight(req.body.topic);
+  res.send({ reply });
 });
+
+exports.api = functions.https.onRequest(app);
