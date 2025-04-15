@@ -1,12 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
 import Dashboard from '../components/Dashboard';
 import { generateResponse } from '@/ai/luxbot';
 import { analyzeMarketSentiment } from '@/ai/sora';
+import { useAuth } from '../components/AuthContext'; // Import useAuth hook
+import { useRouter } from 'next/navigation';
 
 const BrokerDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
     const [soraAnalysis, setSoraAnalysis] = useState<string>('');
+    const { userRole, loading } = useAuth(); // Use the useAuth hook
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && userRole !== 'broker' && userRole !== 'admin' && userRole !== 'superadmin') {
+            router.push('/'); // Redirect if not authorized
+        }
+    }, [userRole, loading, router]);
 
     useEffect(() => {
         const fetchLuxBotResponse = async () => {
@@ -22,6 +31,10 @@ const BrokerDashboard: React.FC = () => {
         fetchLuxBotResponse();
         fetchSoraAnalysis();
     }, []);
+
+    if (loading) {
+        return <div>Loading...</div>; // Loading state
+    }
 
     return (
         <Dashboard>
