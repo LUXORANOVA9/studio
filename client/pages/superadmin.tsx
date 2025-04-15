@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Dashboard from '../components/Dashboard';
 import { generateResponse } from '@/ai/luxbot';
@@ -5,6 +7,7 @@ import { analyzeMarketSentiment } from '@/ai/sora';
 import { useAuth } from '../components/AuthContext'; // Import useAuth hook
 import { useRouter } from 'next/navigation';
 import WhiteLabelDeployer from '@/components/WhiteLabelDeployer';
+import TreasuryDashboard from '@/components/TreasuryDashboard';
 
 const SuperAdminDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
@@ -53,6 +56,9 @@ const SuperAdminDashboard: React.FC = () => {
             </div>
             <div className="bg-white p-4 rounded shadow mt-4">
                 <WhiteLabelDeployer />
+            </div>
+            <div className="bg-white p-4 rounded shadow mt-4">
+                <TreasuryDashboard />
             </div>
         </Dashboard>
     );

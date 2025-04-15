@@ -355,6 +355,24 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config]
 }
 
+interface ChartProps {
+    data: { name: string; revenue: number }[];
+}
+
+const Chart: React.FC<ChartProps> = ({ data }) => {
+    return (
+        <RechartsPrimitive.ResponsiveContainer width="100%" height={300}>
+            <RechartsPrimitive.LineChart data={data}>
+                <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+                <RechartsPrimitive.XAxis dataKey="name" />
+                <RechartsPrimitive.YAxis />
+                <RechartsPrimitive.Tooltip />
+                <RechartsPrimitive.Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
+            </RechartsPrimitive.LineChart>
+        </RechartsPrimitive.ResponsiveContainer>
+    );
+};
+
 export {
   ChartContainer,
   ChartTooltip,
@@ -362,4 +380,5 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  Chart
 }
