@@ -44,6 +44,20 @@ LuxoraNova is a luxury fintech SaaS engine designed to automate wealth generatio
     npm start
     ```
 
+## Core Tech Stack
+- **Frontend:** React + TailwindCSS + Framer Motion
+- **Backend:** Node.js + Express + WebSocket
+- **Auth:** Firebase + JWT + RBAC role mapping
+- **AI Integration:**
+  - LUXBot: OpenAI API (GPT-4 + rules-based)
+  - SORA: Gemini Pro (Langchain + analytics modules)
+- **Blockchain:**
+  - Solidity (ERC-1155 smart contract)
+  - IPFS metadata pinning via Pinata
+  - Polygon chain deployment
+- **CI/CD:** GitHub Actions + Docker + Netlify/Vercel + Firebase Hosting
+- **Database:** PostgreSQL + MongoDB Hybrid
+
 ## Firebase Deployment
 1.  **Install Firebase CLI:**
     ```bash
