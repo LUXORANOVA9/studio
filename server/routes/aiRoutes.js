@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { generateResponse, onboardUser, captureLead } = require('../ai/luxbot');
+const { generateResponse, onboardUser, captureLead, trackReferralBonus } = require('../ai/luxbot');
 
 // Endpoint to ask LUXBot a question
 router.post('/ask-luxbot', async (req, res) => {
@@ -37,6 +37,18 @@ router.post('/capture-lead', async (req, res) => {
     console.error("Error capturing lead:", error);
     res.status(500).send({ message: "Failed to capture lead", error: error.message });
   }
+});
+
+// Endpoint to track a referral bonus (with potential NFT reward)
+router.post('/track-referral-bonus', async (req, res) => {
+    try {
+        const { referralId, amount } = req.body;
+        const response = await trackReferralBonus(referralId, amount);
+        res.status(200).send({ response });
+    } catch (error) {
+        console.error("Error tracking referral bonus:", error);
+        res.status(500).send({ message: "Failed to track referral bonus", error: error.message });
+    }
 });
 
 module.exports = router;
