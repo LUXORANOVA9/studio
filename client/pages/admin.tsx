@@ -4,12 +4,14 @@ import { generateResponse } from '@/ai/luxbot';
 import { analyzeMarketSentiment } from '@/ai/sora';
 import { useAuth } from '../components/AuthContext'; // Import useAuth hook
 import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AdminDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
     const [soraAnalysis, setSoraAnalysis] = useState<string>('');
     const { userRole, loading } = useAuth(); // Use the useAuth hook
     const router = useRouter();
+    const [versionLogs, setVersionLogs] = useState<string>('');
 
     useEffect(() => {
         if (!loading && userRole !== 'admin' && userRole !== 'superadmin') {
@@ -28,8 +30,16 @@ const AdminDashboard: React.FC = () => {
             setSoraAnalysis(analysis);
         };
 
+        const fetchVersionLogs = async () => {
+          // Replace with your actual version log retrieval logic
+          // This could involve reading a file, calling an API, etc.
+          const logs = "v1.0: Initial release\nv1.1: Added SORA AI integration\nv1.2: Improved LUXBot performance";
+          setVersionLogs(logs);
+        };
+
         fetchLuxBotResponse();
         fetchSoraAnalysis();
+        fetchVersionLogs();
     }, []);
 
     if (loading) {
@@ -50,6 +60,14 @@ const AdminDashboard: React.FC = () => {
                 <h3>SORA AI Analysis:</h3>
                 <p>{soraAnalysis || 'Loading SORA AI analysis...'}</p>
             </div>
+            <Card className="w-full mt-4">
+              <CardHeader>
+                <CardTitle>Version Comparison Logs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <pre className="whitespace-pre-wrap">{versionLogs || 'Loading version logs...'}</pre>
+              </CardContent>
+            </Card>
         </Dashboard>
     );
 };
