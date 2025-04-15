@@ -71,11 +71,21 @@ const WhiteLabelDeployer: React.FC = () => {
                         <Label htmlFor="taxRules">Tax Rules</Label>
                         <Textarea
                             id="taxRules"
-                            {...register('taxRules', { required: 'Tax rules are required' })}
+                            {...register('taxRules', { required: false })}
                             className="w-full"
                         />
                         {errors.taxRules && <p className="text-red-500">{errors.taxRules.message}</p>}
                     </div>
+
+                      <div>
+                          <Label htmlFor="luxoTokenAddress">LUXO Token Address</Label>
+                          <Input
+                              id="luxoTokenAddress"
+                              type="text"
+                              {...register('luxoTokenAddress', { required: false })}
+                              className="w-full"
+                          />
+                      </div>
                     <Button type="submit" className="w-full">
                         Deploy White-Label Instance
                     </Button>
@@ -86,5 +96,3 @@ const WhiteLabelDeployer: React.FC = () => {
 };
 
 export default WhiteLabelDeployer;
-
-    

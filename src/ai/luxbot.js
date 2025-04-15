@@ -1,4 +1,3 @@
-
 // ai/luxbot.js
 // LUXBot v1: GPT-powered virtual assistant for user onboarding, FAQ, lead conversion, CRM sync, and $LUXO token management
 // Built using OpenAI or Gemini API, connected to /api/ask-luxbot backend, integrates onboarding script, lead capture, chatbot simulation, and token interactions

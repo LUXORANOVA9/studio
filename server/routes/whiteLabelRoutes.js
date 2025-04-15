@@ -5,5 +5,3 @@ const whiteLabelController = require('../controllers/whiteLabelController');
 router.post('/create', whiteLabelController.createWhiteLabel);
 
 module.exports = router;
-
-    

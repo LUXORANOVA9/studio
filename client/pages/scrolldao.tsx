@@ -1,5 +1,7 @@
+
 import React from 'react';
 import Dashboard from '../components/Dashboard';
+import ScrollDAO from '@/components/ScrollDAO';
 
 const ScrollDAOPage: React.FC = () => {
     return (
@@ -9,6 +11,7 @@ const ScrollDAOPage: React.FC = () => {
                 <p>As an NFT Scroll holder, you can participate in voting on proposals that shape the future of LuxoraNova.</p>
                 {/* Add proposal listings, voting interface, etc. here */}
                 <p>This page is under construction. Stay tuned for updates!</p>
+                <ScrollDAO />
             </div>
         </Dashboard>
     );

@@ -75,19 +75,6 @@ app.post('/webhook/ai-report', (req, res) => {
   res.status(200).send({ message: 'AI report webhook processed' });
 });
 
-app.post('/api/update-user-eth-address', async (req, res) => {
-    const { userId, ethAddress } = req.body;
-
-    try {
-        const userDocRef = admin.firestore().doc(db, "users", userId);
-        await userDocRef.update({ ethAddress: ethAddress });
-        res.status(200).send({ message: 'User Ethereum address updated successfully' });
-    } catch (error) {
-        console.error('Error updating user Ethereum address:', error);
-        res.status(500).send({ message: 'Failed to update user Ethereum address', error: error.message });
-    }
-});
-
 // Start the server
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
