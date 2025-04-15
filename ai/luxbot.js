@@ -1,109 +1,17 @@
 
-/ ai/luxbot.js
-// LUXBot v1: GPT-powered virtual assistant for user onboarding, FAQ, lead conversion, and CRM sync
-// Built using OpenAI or Gemini API, connected to /api/ask-luxbot backend, integrates onboarding script, lead capture, chatbot simulation
+// 📁 ai/luxbot.js
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import dotenv from "dotenv";
+dotenv.config();
 
-const { OpenAI } = require('openai');
-const { Pinecone } = require('@pinecone-database/pinecone');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Initialize OpenAI API
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Initialize Pinecone for vector storage
-const pinecone = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY,
-  environment: process.env.PINECONE_ENVIRONMENT,
-});
-
-const index = pinecone.Index("luxbot-index"); // Replace with your Pinecone index name
-
-async function getRelevantContext(query) {
-  try {
-    const queryEmbedding = await openai.embeddings.create({
-      input: query,
-      model: "text-embedding-ada-002",
-    });
-
-    const queryVector = queryEmbedding.data[0].embedding;
-
-    const results = await index.query({
-      vector: queryVector,
-      topK: 5, // Number of results to return
-      includeMetadata: true,
-    });
-
-    // Extract text from the hits
-    const context = results.matches.map((hit) => hit.metadata.text).join("\n");
-    return context;
-
-  } catch (error) {
-    console.error("Error getting relevant context from Pinecone:", error);
-    return ""; // Return an empty string if there is an error
-  }
+export async function askLUXBot(prompt) {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const chat = model.startChat();
+  const result = await chat.sendMessage(prompt);
+  return result.response.text();
 }
 
-async function generateResponse(prompt) {
-  // Get relevant context from Pinecone
-  const context = await getRelevantContext(prompt);
-
-  // Modify the prompt to include the context
-  const augmentedPrompt = `You are a helpful virtual assistant named LUXBot. You are responsible for user onboarding, answering FAQs, lead conversion, and CRM sync. Use the following context to answer the question. If the context is not relevant, answer the question to the best of your ability.\n\nContext: ${context}\n\nQuestion: ${prompt}`;
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "system", content: "You are LUXBot, a helpful virtual assistant." },
-                 { role: "user", content: augmentedPrompt }],
-      max_tokens: 150,
-      n: 1,
-      stop: null,
-      temperature: 0.7,
-    });
-
-    return response.choices[0].message.content.trim();
-  } catch (error) {
-    console.error("Error generating response:", error);
-    return "I'm sorry, I encountered an error. Please try again.";
-  }
-}
-
-// Function to simulate user onboarding
-async function onboardUser(userInfo) {
-  // Extract relevant information from userInfo
-  const { userId, name, email } = userInfo;
-
-  // Use the information to create a personalized onboarding message
-  const onboardingMessage = `Welcome to LuxoraNova, ${name}! We're excited to have you on board. Here are a few steps to get started:\n1. Set up your profile.\n2. Explore the dashboard.\n3. Contact support if you need any help.`;
-
-  try {
-    // You can also log the onboarding event in your database
-    console.log(`User ${userId} onboarded successfully.`);
-
-    // Return a success message
-    return onboardingMessage;
-  } catch (error) {
-    console.error("Error onboarding user:", error);
-    return "I'm sorry, I encountered an error. Please try again.";
-  }
-}
-
-// Function to simulate lead capture
-async function captureLead(leadInfo) {
-  // Extract relevant information from leadInfo
-  const { name, email, message } = leadInfo;
-
-  try {
-    // You can also log the lead capture event in your database
-    console.log(`Lead captured successfully: ${name} - ${email}`);
-
-    // Return a success message
-    return "Thank you for your interest in LuxoraNova! We will get back to you soon.";
-  } catch (error) {
-    console.error("Error capturing lead:", error);
-    return "I'm sorry, I encountered an error. Please try again.";
-  }
-}
-
-module.exports = { generateResponse, onboardUser, captureLead };
+// Example usage:
+// askLUXBot("How do I onboard a high-net-worth client?").then(console.log);
