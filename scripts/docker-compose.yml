@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  server:
+    build:
+      context: ../server
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      - FIREBASE_API_KEY=${FIREBASE_API_KEY}
+      - FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
+      - FIREBASE_MESSAGING_SENDER_ID=${FIREBASE_MESSAGING_SENDER_ID}
+      - FIREBASE_APP_ID=${FIREBASE_APP_ID}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+volumes:
+  db_data:
