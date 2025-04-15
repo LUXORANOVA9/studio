@@ -39,6 +39,40 @@ app.post('/api/track-referral-bonus', (req, res) => {
     res.status(200).send({ message: 'Referral bonus tracked successfully' });
 });
 
+// Webhook endpoints for automation
+app.post('/webhook/new-client', (req, res) => {
+  // Logic to handle new client webhooks (e.g., from Firebase)
+  const clientData = req.body;
+  console.log('New client webhook received:', clientData);
+
+  // TODO: Integrate with Zapier, Notion API, Telegram/Slack
+  // Example: Send email via Zapier, create task in Notion, send alert to Telegram
+
+  res.status(200).send({ message: 'New client webhook processed' });
+});
+
+app.post('/webhook/nft-sale', (req, res) => {
+  // Logic to handle NFT sale webhooks (e.g., from smart contract events)
+  const saleData = req.body;
+  console.log('NFT sale webhook received:', saleData);
+
+  // TODO: Integrate with Zapier, Notion API, Telegram/Slack
+  // Example: Send email via Zapier, update CRM in Notion, send alert to Telegram
+
+  res.status(200).send({ message: 'NFT sale webhook processed' });
+});
+
+app.post('/webhook/ai-report', (req, res) => {
+  // Logic to handle AI report webhooks (e.g., from SORA AI)
+  const reportData = req.body;
+  console.log('AI report webhook received:', reportData);
+
+  // TODO: Integrate with Zapier, Notion API, Telegram/Slack
+  // Example: Send email via Zapier, update analytics dashboard in Notion, send alert to Telegram
+
+  res.status(200).send({ message: 'AI report webhook processed' });
+});
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
