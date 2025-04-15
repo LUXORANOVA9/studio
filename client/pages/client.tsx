@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Dashboard from '../components/Dashboard';
 import { generateResponse } from '@/ai/luxbot';
@@ -51,6 +52,42 @@ const ClientDashboard: React.FC = () => {
                 <h3>SORA AI Analysis:</h3>
                 <p>{soraAnalysis || 'Loading SORA AI analysis...'}</p>
             </div>
+              {/* LUXBot Chatbot Simulation */}
+              <div className="bg-white p-4 rounded shadow mt-4">
+                  <h3>Ask LUXBot:</h3>
+                  <input
+                      type="text"
+                      placeholder="Enter your question"
+                      className="w-full border rounded p-2 mb-2"
+                  />
+                  <button className="bg-blue-500 text-white rounded p-2">Ask</button>
+              </div>
+
+              {/* User Onboarding Simulation */}
+              <div className="bg-white p-4 rounded shadow mt-4">
+                  <h3>Simulate User Onboarding:</h3>
+                  <button className="bg-green-500 text-white rounded p-2">Onboard Me!</button>
+              </div>
+
+              {/* Lead Capture Form Simulation */}
+              <div className="bg-white p-4 rounded shadow mt-4">
+                  <h3>Interested in LuxoraNova?</h3>
+                  <input
+                      type="text"
+                      placeholder="Name"
+                      className="w-full border rounded p-2 mb-2"
+                  />
+                  <input
+                      type="email"
+                      placeholder="Email"
+                      className="w-full border rounded p-2 mb-2"
+                  />
+                  <textarea
+                      placeholder="Message"
+                      className="w-full border rounded p-2 mb-2"
+                  />
+                  <button className="bg-yellow-500 text-white rounded p-2">Submit</button>
+              </div>
             <Billing />
         </Dashboard>
     );

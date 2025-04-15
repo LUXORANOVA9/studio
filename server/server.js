@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -7,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const dataRoutes = require('./routes/dataRoutes');
 const whiteLabelRoutes = require('./routes/whiteLabelRoutes'); // Import whiteLabelRoutes
 const billingRoutes = require('./routes/billingRoutes'); // Import billing routes
+const aiRoutes = require('./routes/aiRoutes'); // Import AI routes
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -17,12 +19,12 @@ app.use(bodyParser.json());
 // Stripe requires raw body
 app.use('/whitelabel/webhook', bodyParser.raw({ type: 'application/json' }));
 
-
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api', dataRoutes);
 app.use('/whitelabel', whiteLabelRoutes); // Use whiteLabelRoutes
 app.use('/billing', billingRoutes); // Use billing routes
+app.use('/ai', aiRoutes); // Use AI routes
 
 app.get('/', (req, res) => {
     res.send('LuxoraNova API is running');
