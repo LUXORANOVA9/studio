@@ -1,0 +1,12 @@
+
+# Build Instructions
+
+This file documents the steps taken to simulate running 'npm install' and 'npm run build'.
+
+## npm install
+
+This command installs the dependencies listed in package.json.  In a real environment, this would be executed from the project root.
+
+## npm run build
+
+This command builds the Next.js application for production, using the settings defined in next.config.js. In a real environment, this would be executed from the project root, after 'npm install' is completed.
