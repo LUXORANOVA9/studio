@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -11,6 +10,11 @@ import WhiteLabelDeployer from '@/components/WhiteLabelDeployer';
 import TreasuryDashboard from '@/components/TreasuryDashboard';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { PlusCircle, UserPlus, Mail, Send, TrendingUp } from 'lucide-react';
 
 const SuperAdminDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
@@ -18,6 +22,11 @@ const SuperAdminDashboard: React.FC = () => {
     const { userRole, loading } = useAuth(); // Use the useAuth hook
     const router = useRouter();
     const [autopilotEnabled, setAutopilotEnabled] = useState(false);
+    const [teamButlers, setTeamButlers] = useState([
+        { id: 1, name: 'Alpha', tasks: 'Lead Generation', performance: '95%' },
+    ]);
+    const [campaignName, setCampaignName] = useState('');
+    const [campaignContent, setCampaignContent] = useState('');
 
     useEffect(() => {
         if (!loading && userRole !== 'superadmin') {
@@ -43,6 +52,14 @@ const SuperAdminDashboard: React.FC = () => {
     if (loading) {
         return <div>Loading...</div>; // Loading state
     }
+
+    const handleAddButler = () => {
+        setTeamButlers([...teamButlers, { id: teamButlers.length + 1, name: 'New Butler', tasks: '', performance: '0%' }]);
+    };
+
+    const handleCampaignLaunch = () => {
+        alert(`Launching campaign "${campaignName}" with content: ${campaignContent}`);
+    };
 
     return (
         <Dashboard>
@@ -80,6 +97,70 @@ const SuperAdminDashboard: React.FC = () => {
                 <p>Begin building the next empire.</p>
                 <a href="#" className="text-blue-500">Learn More about ZYVAH</a>
             </div>
+
+            {/* LuxoraNova OS */}
+            <Card className="w-full mt-4">
+                <CardHeader>
+                    <CardTitle>LuxoraNova OS: Internal Tools</CardTitle>
+                    <CardDescription>Manage team, campaigns, and empire analytics.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    {/* Team AI Butlers */}
+                    <div>
+                        <CardTitle>Team AI Butlers <Button variant="ghost" size="icon" onClick={handleAddButler}><PlusCircle className="h-4 w-4" /></Button></CardTitle>
+                        <CardDescription>Assign tasks and track performance of your AI team.</CardDescription>
+                        <ul className="list-none p-0">
+                            {teamButlers.map(butler => (
+                                <li key={butler.id} className="flex items-center justify-between py-2">
+                                    <span>{butler.name}: {butler.tasks} ({butler.performance})</span>
+                                    {/* Add controls for task assignment, performance review, etc. */}
+                                </li>
+                            ))}
+                        </ul>
+                        
+                    </div>
+
+                    {/* Drag-Drop Campaign Creator */}
+                    <div>
+                        <CardTitle>Campaign Creator</CardTitle>
+                        <CardDescription>Launch marketing campaigns across multiple channels.</CardDescription>
+                        <Input
+                            type="text"
+                            placeholder="Campaign Name"
+                            value={campaignName}
+                            onChange={(e) => setCampaignName(e.target.value)}
+                            className="mb-2"
+                        />
+                        <Textarea
+                            placeholder="Campaign Content"
+                            value={campaignContent}
+                            onChange={(e) => setCampaignContent(e.target.value)}
+                            className="mb-2"
+                        />
+                        <div className="flex space-x-2">
+                            <Button variant="outline"><UserPlus className="h-4 w-4 mr-2" />Reels</Button>
+                            <Button variant="outline"><Mail className="h-4 w-4 mr-2" />Email</Button>
+                            <Button variant="outline"><Send className="h-4 w-4 mr-2" />Telegram</Button>
+                        </div>
+                        <Button onClick={handleCampaignLaunch} className="mt-2">Launch Campaign</Button>
+                    </div>
+
+                    {/* Revenue KPI Dashboards */}
+                    <div>
+                        <CardTitle>Revenue KPI Dashboard</CardTitle>
+                        <CardDescription>Track key performance indicators across your empire.</CardDescription>
+                        {/* Placeholder: Implement charts, graphs, tables, etc. */}
+                        <Button variant="secondary"><TrendingUp className="h-4 w-4 mr-2" />View Analytics</Button>
+                    </div>
+
+                    {/* Clone Creation Wizard */}
+                    <div>
+                        <CardTitle>Clone Creation Wizard</CardTitle>
+                        <CardDescription>Create new white-label instances with ease.</CardDescription>
+                        <Button variant="secondary">Create New Clone</Button>
+                    </div>
+                </CardContent>
+            </Card>
         </Dashboard>
     );
 };
