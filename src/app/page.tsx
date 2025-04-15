@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, {useState} from 'react';
@@ -10,7 +9,7 @@ import {analyzeRepoContent, AnalyzeRepoContentOutput} from '@/ai/flows/analyze-r
 import {generateLandingPageCopy, GenerateLandingPageCopyOutput} from '@/ai/flows/generate-landing-page-copy';
 import {toast} from '@/hooks/use-toast';
 import {Copy, RefreshCw} from 'lucide-react';
-import {useCopyToClipboard} from 'usehooks-ts';
+// import {useCopyToClipboard} from 'usehooks-ts'; // Removed import
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Github} from 'lucide-react';
 
@@ -20,7 +19,7 @@ const Page = () => {
   const [landingPageCopy, setLandingPageCopy] = useState<GenerateLandingPageCopyOutput | null>(null);
   const [generatedHtml, setGeneratedHtml] = useState<string | null>(null);
   const [copyValue, setCopyValue] = useState('');
-  const [value, copy] = useCopyToClipboard();
+  // const [value, copy] = useCopyToClipboard(); // Removed declaration
 
   const handleRepoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRepoUrl(e.target.value);
@@ -142,7 +141,8 @@ const Page = () => {
   };
 
   const handleCopyHtml = () => {
-    copy(copyValue);
+    // copy(copyValue); // Removed call to copy
+    navigator.clipboard.writeText(copyValue);
     toast({
       title: 'HTML copied to clipboard!',
       description: 'Paste it into your favorite editor.',
