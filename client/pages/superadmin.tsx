@@ -14,7 +14,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, UserPlus, Mail, Send, TrendingUp } from 'lucide-react';
+import { PlusCircle, UserPlus, Mail, Send, TrendingUp, ShoppingBag } from 'lucide-react';
 
 const SuperAdminDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
@@ -158,6 +158,13 @@ const SuperAdminDashboard: React.FC = () => {
                         <CardTitle>Clone Creation Wizard</CardTitle>
                         <CardDescription>Create new white-label instances with ease.</CardDescription>
                         <Button variant="secondary">Create New Clone</Button>
+                    </div>
+
+                     {/* Clone Store Link */}
+                     <div>
+                        <CardTitle>International Cloning Accelerator</CardTitle>
+                        <CardDescription>Launch new clones worldwide.</CardDescription>
+                        <Button variant="secondary"><ShoppingBag className="h-4 w-4 mr-2" />View Clones</Button>
                     </div>
                 </CardContent>
             </Card>
