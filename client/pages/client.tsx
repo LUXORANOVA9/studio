@@ -4,6 +4,7 @@ import { generateResponse } from '@/ai/luxbot';
 import { analyzeMarketSentiment } from '@/ai/sora';
 import { useAuth } from '../components/AuthContext'; // Import useAuth hook
 import { useRouter } from 'next/navigation';
+import Billing from '@/components/Billing';
 
 const ClientDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
@@ -50,6 +51,7 @@ const ClientDashboard: React.FC = () => {
                 <h3>SORA AI Analysis:</h3>
                 <p>{soraAnalysis || 'Loading SORA AI analysis...'}</p>
             </div>
+            <Billing />
         </Dashboard>
     );
 };
