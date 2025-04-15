@@ -8,12 +8,15 @@ import { useAuth } from '../components/AuthContext'; // Import useAuth hook
 import { useRouter } from 'next/navigation';
 import WhiteLabelDeployer from '@/components/WhiteLabelDeployer';
 import TreasuryDashboard from '@/components/TreasuryDashboard';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const SuperAdminDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
     const [soraAnalysis, setSoraAnalysis] = useState<string>('');
     const { userRole, loading } = useAuth(); // Use the useAuth hook
     const router = useRouter();
+    const [autopilotEnabled, setAutopilotEnabled] = useState(false);
 
     useEffect(() => {
         if (!loading && userRole !== 'superadmin') {
@@ -60,10 +63,24 @@ const SuperAdminDashboard: React.FC = () => {
             <div className="bg-white p-4 rounded shadow mt-4">
                 <TreasuryDashboard />
             </div>
+            {/* Autopilot Control Section */}
+            <div className="bg-white p-4 rounded shadow mt-4">
+                <h2>Autopilot Mode</h2>
+                <div className="flex items-center space-x-2">
+                    <Switch id="autopilot" checked={autopilotEnabled} onCheckedChange={setAutopilotEnabled} />
+                    <Label htmlFor="autopilot">Enable Full Autopilot</Label>
+                </div>
+                <p>Engage AI-driven operations for wealth generation and expansion.</p>
+                <p>Note: DAO-style investor governance can be optionally deployed.</p>
+            </div>
+            {/* ZYVAH Venture Link */}
+            <div className="bg-white p-4 rounded shadow mt-4">
+                <h2>ZYVAH by LuxoraNova</h2>
+                <p>Begin building the next empire.</p>
+                <a href="#" className="text-blue-500">Learn More about ZYVAH</a>
+            </div>
         </Dashboard>
     );
 };
 
 export default SuperAdminDashboard;
-
-    
