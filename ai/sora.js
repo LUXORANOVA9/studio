@@ -38,3 +38,4 @@ async function analyzeMarketSentiment(prompt) {
 }
 
 module.exports = { analyzeMarketSentiment };
+

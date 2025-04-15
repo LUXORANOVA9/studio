@@ -68,3 +68,4 @@ async function generateResponse(prompt) {
 }
 
 module.exports = { generateResponse };
+
