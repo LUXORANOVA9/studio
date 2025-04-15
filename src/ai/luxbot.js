@@ -4,6 +4,7 @@
 
 const { OpenAI } = require('openai');
 const { Pinecone } = require('@pinecone-database/pinecone');
+const { admin } = require('../auth/firebaseAdmin'); // Import Firebase Admin SDK
 
 // Initialize OpenAI API
 const openai = new OpenAI({
