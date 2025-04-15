@@ -9,5 +9,14 @@ module.exports = {
       url: process.env.POLYGON_RPC_URL,
       accounts: [process.env.POLYGON_PRIVATE_KEY],
     }
+  },
+  paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts"
+  },
+  mocha: {
+    timeout: 40000
   }
 };

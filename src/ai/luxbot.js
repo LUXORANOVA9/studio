@@ -1,7 +1,7 @@
 
 // ai/luxbot.js
-// LUXBot v1: GPT-powered virtual assistant for user onboarding, FAQ, lead conversion, and CRM sync
-// Built using OpenAI or Gemini API, connected to /api/ask-luxbot backend, integrates onboarding script, lead capture, chatbot simulation
+// LUXBot v1: GPT-powered virtual assistant for user onboarding, FAQ, lead conversion, CRM sync, and $LUXO token management
+// Built using OpenAI or Gemini API, connected to /api/ask-luxbot backend, integrates onboarding script, lead capture, chatbot simulation, and token interactions
 
 const { OpenAI } = require('openai');
 const { Pinecone } = require('@pinecone-database/pinecone');
@@ -50,7 +50,7 @@ async function generateResponse(prompt) {
   const context = await getRelevantContext(prompt);
 
   // Modify the prompt to include the context
-  const augmentedPrompt = `You are a helpful virtual assistant named LUXBot. You are responsible for user onboarding, answering FAQs, lead conversion, and CRM sync. Use the following context to answer the question. If the context is not relevant, answer the question to the best of your ability.\n\nContext: ${context}\n\nQuestion: ${prompt}`;
+  const augmentedPrompt = `You are a helpful virtual assistant named LUXBot. You are responsible for user onboarding, answering FAQs, lead conversion, CRM sync, and helping users manage their $LUXO tokens. Use the following context to answer the question. If the context is not relevant, answer the question to the best of your ability.\n\nContext: ${context}\n\nQuestion: ${prompt}`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -76,7 +76,7 @@ async function onboardUser(userInfo) {
   const { userId, name, email } = userInfo;
 
   // Use the information to create a personalized onboarding message
-  const onboardingMessage = `Welcome to LuxoraNova, ${name}! We're excited to have you on board. Here are a few steps to get started:\n1. Set up your profile.\n2. Explore the dashboard.\n3. Contact support if you need any help.`;
+  const onboardingMessage = `Welcome to LuxoraNova, ${name}! We're excited to have you on board. Here are a few steps to get started:\n1. Set up your profile.\n2. Explore the dashboard.\n3. Connect your wallet to claim your initial $LUXO tokens.\n4. Contact support if you need any help.`;
 
   try {
     // You can also log the onboarding event in your database
@@ -126,7 +126,11 @@ async function trackReferralBonus(referralId, amount) {
             // Simulate NFT airdrop logic (mint NFT to referring user)
             const nftType = "Gold"; // You can determine NFT type based on bonus amount
             console.log(`Simulating NFT (${nftType}) airdrop to user ${referralId}`);
-            return `Successfully credited bonus and triggered NFT (${nftType}) airdrop!`;
+
+            // Simulate awarding $LUXO tokens for the referral
+            const luxoRewardAmount = 500; // Example: Reward 500 $LUXO tokens
+            console.log(`Simulating awarding ${luxoRewardAmount} $LUXO tokens to user ${referralId}`);
+            return `Successfully credited bonus, triggered NFT (${nftType}) airdrop, and awarded ${luxoRewardAmount} $LUXO tokens!`;
         }
 
         return "Referral bonus tracked successfully.";

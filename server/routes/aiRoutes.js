@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const { generateResponse, onboardUser, captureLead, trackReferralBonus } = require('../ai/luxbot');

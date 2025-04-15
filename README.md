@@ -1,7 +1,7 @@
 # LuxoraNova Autopilot Empire v1.0
 
 ## Project Overview
-LuxoraNova is a luxury fintech SaaS engine designed to automate wealth generation and global expansion. This MVP includes a tiered role system, AI agents, blockchain integration, subscription-based monetization, and white-label licensing.
+LuxoraNova is a luxury fintech SaaS engine designed to automate wealth generation and global expansion. This MVP includes a tiered role system, AI agents, blockchain integration, subscription-based monetization, white-label licensing, and the $LUXO token to unify all reward systems.
 
 ## Core Features
 - **Tiered Role System:** SuperAdmin, Admin, Broker, Client
@@ -9,6 +9,7 @@ LuxoraNova is a luxury fintech SaaS engine designed to automate wealth generatio
 - **ERC-1155 NFT Access:** Unlock dashboards with NFT ownership
 - **Global White-Label Deployment:** Customizable branding and rules
 - **Responsive React Frontend:** Modern and intuitive UI
+- **$LUXO Token Integration:** Unified reward system for access, referrals, and governance
 
 ## Setup Instructions
 1.  **Clone the repository:**
@@ -24,7 +25,7 @@ LuxoraNova is a luxury fintech SaaS engine designed to automate wealth generatio
     ```
 3.  **Configure environment variables:**
     -   Create `.env` files in the `client`, `server`, and `contracts` directories using the `.env.example` as a template.
-    -   Fill in the required API keys, Firebase configuration, and blockchain deployment details.
+    -   Fill in the required API keys, Firebase configuration, and blockchain deployment details, including the $LUXO token contract address.
 
 4.  **Deploy smart contracts:**
     ```bash
@@ -55,6 +56,7 @@ LuxoraNova is a luxury fintech SaaS engine designed to automate wealth generatio
   - Solidity (ERC-1155 smart contract)
   - IPFS metadata pinning via Pinata
   - Polygon chain deployment
+  - $LUXO Token
 - **CI/CD:** GitHub Actions + Docker + Netlify/Vercel + Firebase Hosting
 - **Database:** PostgreSQL + MongoDB Hybrid
 
@@ -81,4 +83,3 @@ Contributions are welcome! Please follow the contributing guidelines.
 
 ## License
 MIT
-
