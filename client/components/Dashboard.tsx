@@ -3,6 +3,7 @@
 import React from 'react';
 import { useAuth } from './AuthContext'; // Assuming you have an AuthContext
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface DashboardProps {
     children: React.ReactNode;
@@ -49,9 +50,20 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
                     <p className="text-sm text-gray-500">Share this link to refer new users.</p>
                 </div>
             )}
+
+            {/* LuxoraNova Academy Link */}
+            <div className="mb-4">
+                <Link href="/academy">
+                    <Button>
+                        Visit LuxoraNova Academy
+                    </Button>
+                </Link>
+            </div>
+
             {children}
         </div>
     );
 };
 
 export default Dashboard;
+
