@@ -1,4 +1,5 @@
-/ ai/luxbot.js
+
+// ai/luxbot.js
 // LUXBot v1: GPT-powered virtual assistant for user onboarding, FAQ, lead conversion, and CRM sync
 // Built using OpenAI or Gemini API, connected to /api/ask-luxbot backend, integrates onboarding script, lead capture, chatbot simulation
 
