@@ -4,6 +4,7 @@ import { generateResponse } from '@/ai/luxbot';
 import { analyzeMarketSentiment } from '@/ai/sora';
 import { useAuth } from '../components/AuthContext'; // Import useAuth hook
 import { useRouter } from 'next/navigation';
+import WhiteLabelDeployer from '@/components/WhiteLabelDeployer';
 
 const SuperAdminDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
@@ -50,8 +51,13 @@ const SuperAdminDashboard: React.FC = () => {
                 <h3>SORA AI Analysis:</h3>
                 <p>{soraAnalysis || 'Loading SORA AI analysis...'}</p>
             </div>
+            <div className="bg-white p-4 rounded shadow mt-4">
+                <WhiteLabelDeployer />
+            </div>
         </Dashboard>
     );
 };
 
 export default SuperAdminDashboard;
+
+    

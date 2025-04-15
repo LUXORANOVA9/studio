@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const dataRoutes = require('./routes/dataRoutes');
+const whiteLabelRoutes = require('./routes/whiteLabelRoutes'); // Import whiteLabelRoutes
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api', dataRoutes);
+app.use('/whitelabel', whiteLabelRoutes); // Use whiteLabelRoutes
 
 app.get('/', (req, res) => {
     res.send('LuxoraNova API is running');
@@ -36,3 +38,5 @@ app.post('/api/track-referral-bonus', (req, res) => {
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
+
+    
