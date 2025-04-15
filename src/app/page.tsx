@@ -96,7 +96,7 @@ const Page = () => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${landingPageCopy.headline}</title>
+        <title>Launch Your SaaS with Ease</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
           .container { width: 80%; margin: auto; overflow: hidden; }
@@ -111,17 +111,17 @@ const Page = () => {
       <body>
         <header>
           <div class="container">
-            <h1>${landingPageCopy.headline}</h1>
-            <p>${landingPageCopy.subheadline}</p>
+            <h1>Launch Your SaaS with Ease</h1>
+            <p>A clean and customizable landing page template to showcase your SaaS product.</p>
           </div>
         </header>
         <section class="container">
           <h2>Key Features</h2>
-          ${landingPageCopy.featureDescriptions.map((feature, index) => `<div class="feature">${feature}</div>`).join('')}
+          <div class="feature">Clean and Modern Design: Experience a visually appealing and intuitive interface.</div><div class="feature">Built with TypeScript: Enjoy the benefits of a robust and scalable codebase.</div><div class="feature">Easy Customization: Tailor the landing page to perfectly match your brand.</div><div class="feature">Open Source: Contribute to the project and help us make it even better.</div>
         </section>
         <footer>
           <div class="container">
-            <p>${landingPageCopy.callToAction}</p>
+            <p>Get Started Today!</p>
           </div>
         </footer>
       </body>
