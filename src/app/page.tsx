@@ -90,12 +90,15 @@ const Page = () => {
       
         
           
-             SaaS Landing Page Generator
+            {/* SaaS Landing Page Generator */}
+            
+              SaaS Landing Page Generator
+            
           
         
         
           
-             Enter your GitHub repository URL to generate a landing page.
+            Enter your GitHub repository URL to generate a landing page.
           
           
             
