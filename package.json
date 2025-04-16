@@ -57,7 +57,8 @@
     "usehooks-ts": "*",
     "zod": "^3.24.2",
     "openai": "*",
-    "@google/generative-ai": "*"
+    "@google/generative-ai": "*",
+    "framer-motion": "*"
   },
   "devDependencies": {
     "@types/node": "^20",
