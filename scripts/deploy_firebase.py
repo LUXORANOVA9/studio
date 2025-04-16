@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 
-# Create folder structure and wireframes for React Mint + Admin App
+# Recreate React folder structure after kernel reset
 project_root = Path("/mnt/data/luxoranova-react-app")
 folders = [
     "src",
