@@ -177,12 +177,16 @@ const Page = () => {
               
             
             
-              Enter your GitHub repository URL to generate a landing page.
+              
+                Enter your GitHub repository URL to generate a landing page.
+              
             
           
           
             
               
+                
+                  
                 
               
             
@@ -201,9 +205,7 @@ const Page = () => {
                 
                   Headline
                   
-                    
-                      {generatedCopy.headline}
-                    
+                    {generatedCopy.headline}
                     
 
                      {
