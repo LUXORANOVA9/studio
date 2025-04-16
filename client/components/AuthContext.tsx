@@ -1,4 +1,3 @@
-'use client';
 
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { FirebaseApp, initializeApp, getApps } from 'firebase/app';
@@ -161,4 +160,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
     return useContext(AuthContext);
 };
+
 

@@ -18,6 +18,24 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
+// Custom hook implementation
+function useCopyToClipboard() {
+  const [isCopied, setIsCopied] = React.useState(false);
+
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 3000); // Reset after 3 seconds
+    } catch (error) {
+      console.error("Copy failed:", error);
+      setIsCopied(false);
+    }
+  };
+
+  return { isCopied, copy };
+}
+
 const Page = () => {
   const [repoUrl, setRepoUrl] = React.useState('');
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -30,7 +48,7 @@ const Page = () => {
   const [isCopyGenerated, setIsCopyGenerated] = React.useState(false);
   const [htmlCode, setHtmlCode] = React.useState('');
   const [isHtmlGenerated, setIsHtmlGenerated] = React.useState(false);
-  const [isCopying, setIsCopying] = React.useState(false);
+  const { isCopied, copy: copyToClipboard } = useCopyToClipboard();
 
   const handleRepoUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRepoUrl(event.target.value);
@@ -142,22 +160,20 @@ const Page = () => {
   };
 
   const handleCopyHTML = async () => {
-    setIsCopying(true);
-    try {
-      await navigator.clipboard.writeText(htmlCode);
-      toast({
-        title: "HTML copied to clipboard!",
-        description: "The HTML code has been successfully copied to your clipboard.",
-      });
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Failed to copy HTML!",
-        description: "There was an error copying the HTML code to your clipboard.",
-      });
-    } finally {
-      setIsCopying(false);
-    }
+    
+    copyToClipboard(htmlCode);
+     if (!isCopied) {
+          toast({
+            title: "Failed to copy HTML!",
+            description: "There was an error copying the HTML code to your clipboard.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "HTML copied to clipboard!",
+            description: "The HTML code has been successfully copied to your clipboard.",
+          });
+        }
   };
 
   return (
@@ -258,8 +274,8 @@ const Page = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleCopyHTML} disabled={isCopying}>
-                {isCopying ? 'Copying...' : 'Copy HTML'}
+              <Button onClick={handleCopyHTML} disabled={isCopied}>
+                {isCopied ? 'Copied!' : 'Copy HTML'}
                 <Copy className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
