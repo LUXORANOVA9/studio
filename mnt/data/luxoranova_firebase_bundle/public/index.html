@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clone Licensing Store | LuxoraNova</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.4.umd.min.js" type="application/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3FkeRJHpX45ltv0QM8ZjCSjG5Eql/Opglh58VPwS3N/irrIC6IVmPXhzP6LmXIHJigR0MwEJEuBN3FQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "YOUR_API_KEY",
+          authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+          projectId: "YOUR_PROJECT_ID",
+          storageBucket: "YOUR_PROJECT_ID.appspot.com",
+          messagingSenderId: "SENDER_ID",
+          appId: "APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const contractAddress = '0xYourContractAddressHere'; // Replace with your contract address
+        const contractABI = [
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "to", "type": "address"},
+                    {"internalType": "uint256", "name": "id", "type": "uint256"},
+                    {"internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"internalType": "bytes", "name": "data", "type": "bytes"}
+                ],
+                "name": "mint",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ]; // Replace with your contract ABI
+        const mintPrice = ethers.utils.parseEther("100"); // Mint price in ether
+        let userWallet;
+        let mintSuccessful = false;
+
+        async function connectWallet() {
+          if (window.ethereum) {
+            try {
+              const provider = new ethers.providers.Web3Provider(window.ethereum);
+              await provider.send("eth_requestAccounts", []);
+              const signer = provider.getSigner();
+              userWallet = await signer.getAddress();
+              document.getElementById('wallet-status').innerText = `Connected Wallet: ${userWallet}`;
+          } catch (error) {
+            console.error("Error connecting wallet:", error);
+            alert("Failed to connect wallet. Please check console for details.");
+          }
+        } else {
+          alert('MetaMask is not installed.');
+        }
+      }
+
+      async function handleMint() {
+        if (!userWallet) {
+            alert('Please connect your wallet first.');
+            return;
+        }
+
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            const tx = await contract.mint(userWallet, 1, 1, "0x", { value: mintPrice });
+            await tx.wait();
+
+            await addDoc(collection(db, "mint_logs"), {
+                wallet: userWallet,
+                txHash: tx.hash,
+                mintedAt: serverTimestamp()
+            });
+
+            mintSuccessful = true;
+            showCertificateButton();
+
+            alert("Scroll Minted Successfully! Transaction: " + tx.hash);
+        } catch (error) {
+            console.error("Minting error:", error);
+            alert("Minting failed: " + error.message);
+        }
+      }
+
+      function showCertificateButton() {
+          document.getElementById('mint-button').style.display = 'none';
+          document.getElementById('cert-button').style.display = 'block';
+      }
+
+
+      async function downloadCertificate() {
+        const element = document.getElementById('certificate');
+        const opt = {
+          margin:       10,
+          filename:     'luxoranova_license.pdf',
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2 },
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+      }
+
+      window.connectWallet = connectWallet;
+      window.handleMint = handleMint;
+      window.downloadCertificate = downloadCertificate;
+
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+        .container { width: 80%; margin: auto; overflow: hidden; }
+        header { background: #1A237E; color: white; padding-top: 30px; min-height: 70px; border-bottom: #00BCD4 3px solid; }
+        header h1, header p { text-align: center; }
+        section { padding: 20px; }
+        .feature { border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; background: white; }
+        .cta { text-align: center; margin: 30px auto; }
+        .cta button { padding: 12px 24px; background-color: #00BCD4; border: none; color: white; font-size: 16px; cursor: pointer; border-radius: 4px; }
+        .wallet-status { margin-top: 10px; font-weight: bold; color: #1A237E; }
+        #certificate { display: none; /* Hidden by default */ }
+        #cert-button { display: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Launch Your Own Fintech Empire</h1>
+            <p>Clone LuxoraNova in your country with one click. No code. No delays. Total control.</p>
+        </div>
+    </header>
+
+    <section class="container">
+        <h2>Why License a LuxoraNova Clone?</h2>
+        <div class="feature">Pre-built AI Dashboards (LUXBot + SORA) out of the box.</div>
+        <div class="feature">White-label your own brand instantly.</div>
+        <div class="feature">NFT Scroll license + blockchain-backed verification.</div>
+        <div class="feature">Revenue-sharing model with low upfront cost.</div>
+        <div class="feature">Fully scalable Firebase + GitHub backend.</div>
+    </section>
+
+    <div class="cta">
+        <p>Ready to claim your territory?</p>
+        <button id="connect-wallet-button" onclick="connectWallet()">Connect Wallet</button>
+        <button id="mint-button" onclick="handleMint()" style="display:none;">Mint Your Clone License</button>
+        <button id="cert-button" onclick="downloadCertificate()" style="display: none;">Download Certificate</button>
+        <p class="wallet-status" id="wallet-status">Not connected</p>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 LuxoraNova Clone Licensing Engine</p>
+        </div>
+    </footer>
+
+    <!-- Certificate Template (Hidden by default) -->
+    <div id="certificate" style="display: none; width: 800px; padding: 20px; border: 2px solid #00BCD4; margin: 20px auto; background-color: white;">
+        <h2>LuxoraNova Clone License</h2>
+        <p>This certificate verifies that <span id="certificate-wallet">User Wallet</span> has successfully minted a LuxoraNova Clone License.</p>
+        <p>Minted on: <span id="certificate-date">Date</span></p>
+        <p>License unlocks: Premium access, Whitelabel Deployment</p>
+        <img src="https://luxoranova.co/assets/scroll-license.png" alt="Scroll License" style="width: 200px; display: block; margin: 20px auto;">
+    </div>
+
+</body>
+</html>
