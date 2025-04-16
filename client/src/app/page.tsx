@@ -13,12 +13,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {AnalyzeRepoContentOutput} from "@/ai/flows/analyze-repo-content";
 
 const Page = () => {
   const [repoUrl, setRepoUrl] = React.useState('');
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [analysisResult, setAnalysisResult] = React.useState<AnalyzeRepoContentOutput | null>(null);
+  const [analysisResult, setAnalysisResult] = React.useState(null);
   const [isGeneratingCopy, setIsGeneratingCopy] = React.useState(false);
   const [generatedCopy, setGeneratedCopy] = React.useState(null);
   const [isGeneratingHtml, setIsGeneratingHtml] = React.useState(false);
