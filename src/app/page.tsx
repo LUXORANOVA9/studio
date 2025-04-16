@@ -1,24 +1,39 @@
+'use client';
+
+import React from 'react';
+
 export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl font-mono text-sm lg:flex flex-col gap-4 items-center">
-        <h1 className="text-3xl font-bold text-center">
-          SaaS Landing Page Generator
+    <main className="min-h-screen bg-gradient-to-br from-[#0e0e2c] via-[#1c1246] to-[#240b36] text-white font-sans px-6 py-16 flex flex-col items-center justify-center">
+      <div className="max-w-4xl text-center">
+        <img
+          src="/logo.svg"
+          alt="LuxoraNova Logo"
+          className="h-12 mx-auto mb-8 animate-fade-in"
+        />
+
+        <h1 className="text-4xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500">
+          Build Your Clone Empire
         </h1>
 
-        <h2 className="text-xl font-semibold text-gray-700 mt-6">
-          Subheadline
-        </h2>
-        <p className="text-base text-gray-500 text-center max-w-xl">
-          Build and deploy beautiful landing pages in seconds with AI-powered templates and one-click integrations.
+        <p className="mt-6 text-lg md:text-xl text-gray-300 max-w-xl mx-auto">
+          Launch fully automated, white-labeled SaaS products backed by our AI engines — the fastest way to scale your digital throne.
         </p>
 
-        <h3 className="text-lg font-semibold mt-8">Feature Descriptions</h3>
-        <ul className="list-disc text-gray-600 pl-5 text-left">
-          <li>Drag & drop builder</li>
-          <li>Mobile-responsive out of the box</li>
-          <li>AI-generated content suggestions</li>
-        </ul>
+        <button className="mt-10 px-8 py-4 text-lg font-bold rounded-2xl shadow-md bg-yellow-500 hover:bg-yellow-400 text-black transition-all duration-300">
+          Mint Your License Now
+        </button>
+
+        <div className="mt-12 text-sm text-gray-500">
+          Powered by <span className="text-white font-semibold">LuxoraNova</span> | LUXBot Engine | Web3 Ready
+        </div>
+      </div>
+
+      {/* Floating LUXBot */}
+      <div className="fixed bottom-6 right-6 animate-fade-in">
+        <button className="bg-[#ffeb3b] text-black px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform">
+          💬 Ask LUXBot
+        </button>
       </div>
     </main>
   );
