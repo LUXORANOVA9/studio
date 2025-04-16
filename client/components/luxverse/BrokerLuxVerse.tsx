@@ -6,6 +6,8 @@ const BrokerLuxVerse: React.FC = () => {
       <h2>Broker LuxVerse</h2>
       {/* Broker-specific content */}
       <p>Access Referral Links and Client Portfolios</p>
+      {/* More details about the Broker LuxVerse can be added here */}
+      <p>Stay tuned for more features!</p>
     </div>
   );
 };
