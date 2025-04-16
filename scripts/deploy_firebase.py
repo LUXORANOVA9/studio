@@ -39,18 +39,19 @@ export default function Admin() {
 }
 """,
     "src/App.jsx": """import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Mint from './pages/Mint';
 import Admin from './pages/Admin';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/mint" element={<Mint />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
-    </Router>
+    
+        
+          
+        
+        
+          
+        
+      
   );
 }
 
@@ -62,7 +63,7 @@ import App from './App';
 import './styles/global.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+root.render();
 """,
     "src/styles/global.css": """body {
   font-family: Arial, sans-serif;
@@ -78,7 +79,7 @@ root.render(<App />);
   <title>LuxoraNova Mint App</title>
 </head>
 <body>
-  <div id="root"></div>
+  
 </body>
 </html>
 """
@@ -91,3 +92,4 @@ for file_path, content in files_content.items():
 # Zip the directory
 zip_path = shutil.make_archive(str(project_root), 'zip', str(project_root))
 zip_path
+
