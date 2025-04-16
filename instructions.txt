@@ -1,2 +1,4 @@
 firebase init functions
 firebase deploy --only functions
+firebase init hosting
+firebase deploy
