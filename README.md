@@ -45,6 +45,11 @@ LuxoraNova is a luxury fintech SaaS engine designed to automate wealth generatio
     npm start
     ```
 
+## Android APK
+The Android APK is compiled with Firebase Auth + Navigation per Role, LUXBot Alpha integrated, Monthly Plan Expiry Test Feature, and Smart Contract Interaction UI.
+
+- **Download Link:** [Download APK (Staging)](https://example.com/luxoranova.apk)  <- Replace with the actual APK download link.
+
 ## Role Test Commands
 To test different roles, you can use the Firebase Authentication emulator and set custom claims for each user.
 
