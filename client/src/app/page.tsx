@@ -13,14 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { analyzeRepoContent } from '@/ai/flows/analyze-repo-content';
-import {generateLandingPageCopy} from '@/ai/flows/generate-landing-page-copy';
-import { Copy } from "lucide-react";
+import {AnalyzeRepoContentOutput} from "@/ai/flows/analyze-repo-content";
 
 const Page = () => {
   const [repoUrl, setRepoUrl] = React.useState('');
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [analysisResult, setAnalysisResult] = React.useState(null);
+  const [analysisResult, setAnalysisResult] = React.useState<AnalyzeRepoContentOutput | null>(null);
   const [isGeneratingCopy, setIsGeneratingCopy] = React.useState(false);
   const [generatedCopy, setGeneratedCopy] = React.useState(null);
   const [isGeneratingHtml, setIsGeneratingHtml] = React.useState(false);
@@ -32,47 +30,30 @@ const Page = () => {
 
   const handleAnalyzeRepository = async () => {
     setIsAnalyzing(true);
-
-    try {
-      const analysisResult = await analyzeRepoContent({repoUrl: repoUrl});
-      setAnalysisResult(analysisResult);
+    // Simulate API call
+    setTimeout(() => {
+      setAnalysisResult({
+        name: 'Sample SaaS',
+        description: 'A description of the SaaS project.',
+        features: ['Feature 1', 'Feature 2'],
+        technologies: ['React', 'Node.js'],
+      });
       setIsAnalyzing(false);
-    } catch (error) {
-      console.error("Error during repository analysis:", error);
-      setIsAnalyzing(false);
-      toast({
-        title: "Error during repository analysis",
-        description: "Please check the repository URL and try again.",
-        variant: "destructive",
-      })
-    }
+    }, 2000);
   };
 
   const handleGenerateCopy = async () => {
     setIsGeneratingCopy(true);
-    try {
-      if (analysisResult) {
-        const landingPageCopy = await generateLandingPageCopy({
-          repoInfo: {
-            name: analysisResult.name,
-            description: analysisResult.description,
-            url: repoUrl,
-            language: analysisResult.technologies.join(', '),
-            readmeContent: analysisResult.description,
-          },
-        });
-        setGeneratedCopy(landingPageCopy);
-        setIsGeneratingCopy(false);
-      }
-    } catch (error) {
-      console.error("Error generating landing page copy:", error);
-       setIsGeneratingCopy(false);
-        toast({
-          title: "Error generating landing page copy",
-          description: "Please try again.",
-          variant: "destructive",
-        })
-    }
+    // Simulate API call
+    setTimeout(() => {
+      setGeneratedCopy({
+        headline: 'Compelling Headline',
+        subheadline: 'Engaging Subheadline',
+        featureDescriptions: ['Feature 1 Description', 'Feature 2 Description'],
+        callToAction: 'Sign Up Now',
+      });
+      setIsGeneratingCopy(false);
+    }, 2000);
   };
 
   const handleGenerateHtml = async () => {
@@ -112,7 +93,7 @@ const Page = () => {
           
             
               {/* SaaS Landing Page Generator */}
-              <div>SaaS Landing Page Generator</div>
+              <>SaaS Landing Page Generator</>
             
           
         
