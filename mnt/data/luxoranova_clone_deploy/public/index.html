@@ -59,6 +59,21 @@
     window.connectWallet = connectWallet;
     window.handleMint = handleMint;
   </script>
+  <script>
+async function connectWallet() {
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      alert('Connected: ' + accounts[0]);
+      window.location.href = '/mint-scroll'; // Proceed to mint page
+    } catch (err) {
+      alert('Wallet connection failed: ' + err.message);
+    }
+  } else {
+    alert('Please install MetaMask to mint your license.');
+  }
+}
+</script>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
     .container { width: 80%; margin: auto; overflow: hidden; }
@@ -96,8 +111,7 @@
   </section>
   <div class="cta">
     <p>Ready to claim your territory?</p>
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <button onclick="handleMint()">Mint Your Clone License</button>
+    <button onclick="connectWallet()">Mint Your Clone License</button>
     <p class="wallet-status" id="wallet-status"></p>
     <a href="/admin.html" target="_blank" style="display:block; margin-top:20px; font-weight:bold;">🔐 View Mint Logs (Admin Panel)</a>
   </div>
