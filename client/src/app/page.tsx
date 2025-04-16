@@ -1,186 +1,153 @@
 'use client';
 
-import React from 'react';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
-import {Textarea} from '@/components/ui/textarea';
-import {Github} from 'lucide-react';
-import { toast } from "@/hooks/use-toast"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { useState } from "react";
+import { ethers } from "ethers";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { motion } from "framer-motion";
 
-const Page = () => {
-  const [repoUrl, setRepoUrl] = React.useState('');
-  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [analysisResult, setAnalysisResult] = React.useState(null);
-  const [isGeneratingCopy, setIsGeneratingCopy] = React.useState(false);
-  const [generatedCopy, setGeneratedCopy] = React.useState(null);
-  const [isGeneratingHtml, setIsGeneratingHtml] = React.useState(false);
-  const [generatedHtml, setGeneratedHtml] = React.useState(null);
-
-  const handleRepoUrlChange = (event) => {
-    setRepoUrl(event.target.value);
-  };
-
-  const handleAnalyzeRepository = async () => {
-    setIsAnalyzing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setAnalysisResult({
-        name: 'Sample SaaS',
-        description: 'A description of the SaaS project.',
-        features: ['Feature 1', 'Feature 2'],
-        technologies: ['React', 'Node.js'],
-      });
-      setIsAnalyzing(false);
-    }, 2000);
-  };
-
-  const handleGenerateCopy = async () => {
-    setIsGeneratingCopy(true);
-    // Simulate API call
-    setTimeout(() => {
-      setGeneratedCopy({
-        headline: 'Compelling Headline',
-        subheadline: 'Engaging Subheadline',
-        featureDescriptions: ['Feature 1 Description', 'Feature 2 Description'],
-        callToAction: 'Sign Up Now',
-      });
-      setIsGeneratingCopy(false);
-    }, 2000);
-  };
-
-  const handleGenerateHtml = async () => {
-    setIsGeneratingHtml(true);
-    // Simulate API call
-    setTimeout(() => {
-      setGeneratedHtml('<p>Generated HTML code</p>');
-      setIsGeneratingHtml(false);
-    }, 2000);
-  };
-
-  const handleRegenerateHeadline = async () => {
-    //Simulate the headline regeneration process
-    setIsGeneratingCopy(true);
-
-    setTimeout(() => {
-      setGeneratedCopy((prevCopy) => ({
-        ...prevCopy,
-        headline: 'A New and Improved Headline!',
-      }));
-      setIsGeneratingCopy(false);
-    }, 2000);
-  };
-
-  const handleCopyHtml = () => {
-     navigator.clipboard.writeText(generatedHtml);
-      toast({
-        title: "HTML copied to clipboard!",
-        description: "Ready to paste into your project.",
-      })
+const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
+const CONTRACT_ABI = [
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "cloneName",
+        type: "string"
+      }
+    ],
+    name: "mintLicense",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
   }
+];
 
-  return (
-    <>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-          <h1 className="text-3xl font-bold text-center w-full">
-            SaaS Landing Page Generator
-          </h1>
-        </div>
-
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white/10 to-transparent dark:from-black dark:via-black/10 dark:to-transparent lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <div className="pointer-events-none flex place-items-center justify-center p-8 text-center">
-            {/* Enter your GitHub repository URL to generate a landing page. */}
-              Enter your GitHub repository URL to generate a landing page.
-            {/* <p>
-              Enter your GitHub repository URL to generate a landing page.
-            </p> */}
-          </div>
-        </div>
-
-        <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:text-left">
-          {/* GitHub Repository URL Input */}
-            {/* GitHub Repository URL */}
-              GitHub Repository URL
-            {/* GitHub Repository URL */}
-          {/* Input and Analyze Button */}
-            {/* Input field for repository URL */}
-              {/* <label htmlFor="repoUrl">GitHub Repository URL</label> */}
-                {/* <Github className="absolute left-3 top-3.5 h-4 w-4 opacity-50 peer-focus:opacity-70 dark:text-white" /> */}
-                  {/* absolute left-3 top-3.5 h-4 w-4 opacity-50 peer-focus:opacity-70 dark:text-white */}
-                
-              {/* <Input
-                  type="text"
-                  placeholder="GitHub Repository URL"
-                  value={repoUrl}
-                  onChange={handleRepoUrlChange}
-                  className="peer pl-9"
-                  id="repoUrl"
-                /> */}
-                {/* <Button onClick={handleAnalyzeRepository} disabled={isAnalyzing}>
-                  {isAnalyzing ? 'Analyzing...' : 'Analyze Repository'}
-                </Button> */}
-                
-              {/* Input field for repository URL */}
-            
-          {/* Input and Analyze Button */}
-        </div>
-
-        {analysisResult && (
-          
-            
-              {/* Copy Information Elements */}
-                
-                  <span>Headline:</span>
-                
-                
-                  <span>Subheadline:</span>
-                
-                
-                  <span>Feature Descriptions:</span>
-                
-                
-                  <span>Call to Action:</span>
-                
-              {/* Copy Information Elements */}
-              {/* Copy Control Buttons */}
-                {/* Regenerate Headline Button */}
-                  {/* Regenerate Headline */}
-                   Regenerate Headline
-                 {/* Regenerate Headline Button */}
-                {/* Download and Copy Buttons */}
-                {/* Generate HTML */}
-                  {/* Generate HTML */}
-                    Generate HTML
-                  {/* Generate HTML */}
-                {/* Download and Copy Buttons */}
-              {/* Copy Control Buttons */}
-            
-          
-        )}
-
-        {generatedHtml && (
-          
-            
-              {/* Generated HTML */}
-                Generated HTML
-              {/* Generated HTML */}
-            {/* Copy HTML Button */}
-              {/* Copy HTML */}
-                Copy HTML
-              {/* Copy HTML Button */}
-            
-          
-        )}
-      </main>
-    </>
-  );
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "luxoranova9",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-export default Page;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+export default function Page() {
+  const [walletAddress, setWalletAddress] = useState("");
+  const [minting, setMinting] = useState(false);
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        setWalletAddress(accounts[0]);
+      } catch (err) {
+        console.error("Wallet connection failed:", err);
+      }
+    } else {
+      alert("Please install MetaMask or a Web3 wallet to continue.");
+    }
+  };
+
+  const handleMint = async (cloneName) => {
+    if (!walletAddress) return alert("Connect your wallet first");
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      setMinting(true);
+      const tx = await contract.mintLicense(cloneName);
+      await tx.wait();
+      await addDoc(collection(db, "mintedClones"), {
+        wallet: walletAddress,
+        clone: cloneName,
+        timestamp: new Date().toISOString()
+      });
+      alert(`${cloneName} license minted & saved to Firestore!`);
+    } catch (err) {
+      console.error("Minting failed:", err);
+      alert("Minting failed. Check console for details.");
+    } finally {
+      setMinting(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#0e0e2c] via-[#1c1246] to-[#240b36] text-white font-sans px-6 py-16 flex flex-col items-center">
+      <div className="max-w-4xl text-center">
+        <img
+          src="/logo.svg"
+          alt="LuxoraNova Logo"
+          className="h-12 mx-auto mb-8 animate-fade-in"
+        />
+
+        <h1 className="text-4xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500">
+          Build Your Clone Empire
+        </h1>
+
+        <p className="mt-6 text-lg md:text-xl text-gray-300 max-w-xl mx-auto">
+          Launch fully automated, white-labeled SaaS products backed by our AI engines — the fastest way to scale your digital throne.
+        </p>
+
+        <button
+          onClick={connectWallet}
+          className="mt-10 px-8 py-4 text-lg font-bold rounded-2xl shadow-md bg-yellow-500 hover:bg-yellow-400 text-black transition-all duration-300"
+        >
+          {walletAddress ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}` : "Connect Wallet"}
+        </button>
+
+        <div className="mt-4 text-sm text-green-400">
+          {walletAddress && "Wallet connected successfully!"}
+        </div>
+
+        <div className="mt-12 text-sm text-gray-500">
+          Powered by <span className="text-white font-semibold">LuxoraNova</span> | LUXBot Engine | Web3 Ready
+        </div>
+      </div>
+
+      {/* Scrollstorm Clone Store Preview */}
+      <section className="w-full mt-24 px-4 md:px-16">
+        <h2 className="text-3xl font-bold text-center mb-12 text-yellow-300">Choose Your Clone</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {["AI Scheduler", "Crypto Terminal", "Auto CRM"].map((title, index) => (
+            <motion.div
+              key={index}
+              className="bg-[#1e1b2f] rounded-2xl p-6 shadow-xl border-2 border-yellow-400 hover:scale-105 transform transition-all duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+            >
+              <h3 className="text-xl font-semibold text-yellow-400 mb-2 flex justify-between">
+                <span>{title}</span>
+                <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs px-3 py-1 rounded-full animate-pulse">
+                  Rare
+                </span>
+              </h3>
+              <p className="text-sm text-gray-300 mb-4">
+                License this powerful clone and launch instantly with your brand.
+              </p>
+              <button
+                onClick={() => handleMint(title)}
+                className="mt-auto px-4 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-400 disabled:opacity-50"
+                disabled={minting}
+              >
+                {minting ? "Minting..." : "Unlock License"}
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Floating LUXBot */}
+      <div className="fixed bottom-6 right-6 animate-fade-in">
+        <button className="bg-[#ffeb3b] text-black px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform">
+          💬 Ask LUXBot
+        </button>
+      </div>
+    </main>
+  );
+}
