@@ -96,33 +96,46 @@ const Page = () => {
 
         <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white/10 to-transparent dark:from-black dark:via-black/10 dark:to-transparent lg:static lg:h-auto lg:w-auto lg:bg-none">
           <div className="pointer-events-none flex place-items-center justify-center p-8 text-center">
-            
+            {/* Enter your GitHub repository URL to generate a landing page. */}
               Enter your GitHub repository URL to generate a landing page.
-            
+            {/* <p>
+              Enter your GitHub repository URL to generate a landing page.
+            </p> */}
           </div>
         </div>
 
         <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:text-left">
-          
-            
-              
-                GitHub Repository URL
-              
-            
-            
-              
+          {/* GitHub Repository URL Input */}
+            {/* GitHub Repository URL */}
+              GitHub Repository URL
+            {/* GitHub Repository URL */}
+          {/* Input and Analyze Button */}
+            {/* Input field for repository URL */}
+              {/* <label htmlFor="repoUrl">GitHub Repository URL</label> */}
+                {/* <Github className="absolute left-3 top-3.5 h-4 w-4 opacity-50 peer-focus:opacity-70 dark:text-white" /> */}
+                  {/* absolute left-3 top-3.5 h-4 w-4 opacity-50 peer-focus:opacity-70 dark:text-white */}
                 
-                  
+              {/* <Input
+                  type="text"
+                  placeholder="GitHub Repository URL"
+                  value={repoUrl}
+                  onChange={handleRepoUrlChange}
+                  className="peer pl-9"
+                  id="repoUrl"
+                /> */}
+                {/* <Button onClick={handleAnalyzeRepository} disabled={isAnalyzing}>
+                  {isAnalyzing ? 'Analyzing...' : 'Analyze Repository'}
+                </Button> */}
                 
-              
+              {/* Input field for repository URL */}
             
-          
+          {/* Input and Analyze Button */}
         </div>
 
         {analysisResult && (
           
             
-              
+              {/* Copy Information Elements */}
                 
                   <span>Headline:</span>
                 
@@ -135,20 +148,19 @@ const Page = () => {
                 
                   <span>Call to Action:</span>
                 
-              
-              
-                
-                  
+              {/* Copy Information Elements */}
+              {/* Copy Control Buttons */}
+                {/* Regenerate Headline Button */}
+                  {/* Regenerate Headline */}
                    Regenerate Headline
-                 
-                
-                
-                
-                  
+                 {/* Regenerate Headline Button */}
+                {/* Download and Copy Buttons */}
+                {/* Generate HTML */}
+                  {/* Generate HTML */}
                     Generate HTML
-                  
-                
-              
+                  {/* Generate HTML */}
+                {/* Download and Copy Buttons */}
+              {/* Copy Control Buttons */}
             
           
         )}
@@ -156,14 +168,13 @@ const Page = () => {
         {generatedHtml && (
           
             
-              
+              {/* Generated HTML */}
                 Generated HTML
-              
-            
-            
-              
+              {/* Generated HTML */}
+            {/* Copy HTML Button */}
+              {/* Copy HTML */}
                 Copy HTML
-              
+              {/* Copy HTML Button */}
             
           
         )}
