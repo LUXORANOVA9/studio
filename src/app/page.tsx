@@ -89,43 +89,51 @@ const Page = () => {
   const handleGenerateHTML = () => {
     setIsHtmlGenerated(true);
     // Generate basic HTML structure based on the generated copy
-    const html = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Headline Generated!</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
-          .container { width: 80%; margin: auto; overflow: hidden; }
-          header { background: #1A237E; color: white; padding-top: 30px; min-height: 70px; border-bottom: #00BCD4 3px solid; }
-          header h1 { text-align: center; }
-          header p { text-align: center; }
-          section { padding: 20px; }
-          .feature { border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; background: white; }
-          footer { text-align: center; padding: 10px; margin-top: 20px; color: white; background-color: #1A237E; }
-        </style>
-      </head>
-      <body>
-        <header>
-          <div class="container">
-            <h1>New Headline Generated!</h1>
-            <p>A production-ready landing page template built with TypeScript.</p>
-          </div>
-        </header>
-        <section class="container">
-          <h2>Key Features</h2>
-          ${generatedCopy.featureDescriptions.map(feature => `<div class="feature">${feature}</div>`).join('')}
-        </section>
-        <footer>
-          <div class="container">
-            <p>${generatedCopy.callToAction}</p>
-          </div>
-        </footer>
-      </body>
-      </html>
-    `;
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clone Licensing Store | LuxoraNova</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+    .container { width: 80%; margin: auto; overflow: hidden; }
+    header { background: #1A237E; color: white; padding-top: 30px; min-height: 70px; border-bottom: #00BCD4 3px solid; }
+    header h1 { text-align: center; }
+    header p { text-align: center; }
+    section { padding: 20px; }
+    .feature { border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; background: white; }
+    footer { text-align: center; padding: 10px; margin-top: 20px; color: white; background-color: #1A237E; }
+    .cta { text-align: center; margin-top: 30px; }
+    .cta button { padding: 10px 20px; background-color: #00BCD4; border: none; color: white; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Launch Your Own Fintech Empire</h1>
+      <p>Clone LuxoraNova in your country with one click. No code. No delays. Total control.</p>
+    </div>
+  </header>
+  <section class="container">
+    <h2>Why License a LuxoraNova Clone?</h2>
+    <div class="feature">Pre-built AI Dashboards (LUXBot + SORA) out of the box.</div>
+    <div class="feature">White-label your own brand instantly.</div>
+    <div class="feature">NFT Scroll license + blockchain-backed verification.</div>
+    <div class="feature">Revenue-sharing model with low upfront cost.</div>
+    <div class="feature">Fully scalable Firebase + GitHub backend.</div>
+  </section>
+  <div class="cta">
+    <p>Ready to claim your territory?</p>
+    <button onclick="window.location.href='/mint-scroll'">Mint Your Clone License</button>
+  </div>
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 LuxoraNova Clone Licensing Engine</p>
+    </div>
+  </footer>
+</body>
+</html>`;
     setHtmlCode(html);
     toast({
       title: "HTML generated!",
