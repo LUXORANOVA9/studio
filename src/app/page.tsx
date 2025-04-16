@@ -86,30 +86,41 @@ const Page = () => {
   }
 
   return (
-    
-      
-        
+    <>
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+          <h1 className="text-3xl font-bold text-center w-full">
+            SaaS Landing Page Generator
+          </h1>
+        </div>
+
+        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white/10 to-transparent dark:from-black dark:via-black/10 dark:to-transparent lg:static lg:h-auto lg:w-auto lg:bg-none">
+          <div className="pointer-events-none flex place-items-center justify-center p-8 text-center">
+            
+              Enter your GitHub repository URL to generate a landing page.
+            
+          </div>
+        </div>
+
+        <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:text-left">
           
             
-              SaaS Landing Page Generator
-            
-          
-        
-        
-          
-            Enter your GitHub repository URL to generate a landing page.
-          
-          
-            
+              
+                GitHub Repository URL
               
             
             
               
+                
+                  
+                
+              
             
           
-        
-        
-          {analysisResult && (
+        </div>
+
+        {analysisResult && (
+          
             
               
                 
@@ -127,34 +138,37 @@ const Page = () => {
               
               
                 
+                  
                    Regenerate Headline
+                 
                 
                 
                 
-                
-                  Generate HTML
+                  
+                    Generate HTML
+                  
                 
               
             
-          )}
+          
+        )}
 
-          {generatedHtml && (
+        {generatedHtml && (
+          
             
               
-                
-                  Generated HTML
-                
-              
-              
-                
-                  Copy HTML
-                
+                Generated HTML
               
             
-          )}
-        
-      
-    
+            
+              
+                Copy HTML
+              
+            
+          
+        )}
+      </main>
+    </>
   );
 };
 
