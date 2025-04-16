@@ -120,23 +120,23 @@ const Page = () => {
         </div>
 
         {analysisResult && (
-          
-            
-              
-                
-                  <span>Headline:</span>
-                
-                
-                  <span>Subheadline:</span>
-                
-                
-                  <span>Feature Descriptions:</span>
-                
-                
-                  <span>Call to Action:</span>
-                
-              
-              
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Analysis Result</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p>
+                  <span>Headline:</span>{analysisResult.name}
+                </p>
+                <p>
+                  <span>Subheadline:</span>{analysisResult.description}
+                </p>
+                <p>
+                  <span>Feature Descriptions:</span>{analysisResult.features}
+                </p>
+                <p>
+                  <span>Call to Action:</span>{analysisResult.technologies}
+                </p>
                 
                   
                    Regenerate Headline
@@ -149,8 +149,8 @@ const Page = () => {
                   
                 
               
-            
-          
+            </CardContent>
+          </Card>
         )}
 
         {generatedHtml && (

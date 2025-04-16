@@ -124,16 +124,16 @@ const Page = () => {
             
               
                 
-                  <span>Headline:</span>
+                  Headline:
                 
                 
-                  <span>Subheadline:</span>
+                  Subheadline:
                 
                 
-                  <span>Feature Descriptions:</span>
+                  Feature Descriptions:
                 
                 
-                  <span>Call to Action:</span>
+                  Call to Action:
                 
               
               
@@ -173,3 +173,4 @@ const Page = () => {
 };
 
 export default Page;
+
