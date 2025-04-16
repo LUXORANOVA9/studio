@@ -116,18 +116,30 @@ To test different roles, you can use the Firebase Authentication emulator and se
     firebase deploy
     ```
 
-**LuxoraNova Empire Organizational Structure**
+**Your smart contract + licensing modal is connected to testnet. Let's switch it from Mumbai → Polygon Mainnet. I need:**
+*   Final contract address confirmation
+*   Wallet receiver for clone fees (e.g., 0xRajKhemani...)
+*   Do you want clone price in MATIC or USDT (Polygon)?**
+
+**Secure environment keys for safe deploy:**
+*   Set your domain + wallet receiver address for clone licensing
+
+**Notes**
+*   SuperAdmin can change these via Firebase Auth UI directly.
+*   This project is toggleable to push to Firebase Hosting under luxoranova.tk.
+
+**[LuxoraNova Empire Organizational Structure]**
 
 ---
 
 ### 👑 1. **Founder & SuperAdmin**
-**Name:** Raj Khemani  
-**Role:** Ultimate authority across product, capital, hiring, global expansion, and tech architecture. Controls all toggles in the platform and oversees every department. 
+**Name:** Raj Khemani
+**Role:** Ultimate authority across product, capital, hiring, global expansion, and tech architecture. Controls all toggles in the platform and oversees every department.
 
 ---
 
 ### 🧠 2. **Chief Technology Officer (CTO)**
-**Function:** Oversees full-stack development, AI integrations (LUXBot, SORA), smart contract security, platform scalability, and DevOps pipelines. 
+**Function:** Oversees full-stack development, AI integrations (LUXBot, SORA), smart contract security, platform scalability, and DevOps pipelines.
 
 ---
 
@@ -137,12 +149,12 @@ To test different roles, you can use the Firebase Authentication emulator and se
 ---
 
 ### 🪙 4. **Chief Capital Officer (CCO)**
-**Function:** Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure. Oversees the deployment, audit, and ongoing governance of ERC-1155 smart contracts, including minting logic and royalty structures.Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure. Oversees the deployment, audit, and ongoing governance of ERC-1155 smart contracts, including minting logic and royalty structures.Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure. Oversees the deployment, audit, and ongoing governance of ERC-1155 smart contracts, including minting logic and royalty structures.Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure. Oversees the deployment, audit, and ongoing governance of ERC-1155 smart contracts, including minting logic and royalty structures.Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure. Oversees the deployment, audit, and ongoing governance of ERC-1155 smart contracts, including minting logic and royalty structures.Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure. Oversees the deployment, audit, and ongoing governance of ERC-1155 smart contracts, including minting logic and royalty structures.Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure.
+**Function:** Manages fundraising, tokenomics, investor relations, DAO structure, and smart treasury infrastructure. Oversees the deployment, audit, and ongoing governance of ERC-1155 smart contracts, including minting logic and royalty structures.
 
 ---
 
 ### 🖥️ 5. **Head of AI & Automation**
-**Function:** Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows and leads the transformation of admin panels and mint systems into modular React applications for scalability and performance.Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows and leads the transformation of admin panels and mint systems into modular React applications for scalability and performance.Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows and leads the transformation of admin panels and mint systems into modular React applications for scalability and performance.Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows and leads the transformation of admin panels and mint systems into modular React applications for scalability and performance.Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows and leads the transformation of admin panels and mint systems into modular React applications for scalability and performance.Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows and leads the transformation of admin panels and mint systems into modular React applications for scalability and performance.Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows.
+**Function:** Directs Gemini + GPT integrations, prompt engineering, LUXBot memory logic, and Firestore sync. Supervises smart dashboard flows and leads the transformation of admin panels and mint systems into modular React applications for scalability and performance.
 
 ---
 
