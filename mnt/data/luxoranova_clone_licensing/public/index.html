@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clone Licensing Store | LuxoraNova</title>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
     .container { width: 80%; margin: auto; overflow: hidden; }
@@ -34,12 +35,45 @@
   </section>
   <div class="cta">
     <p>Ready to claim your territory?</p>
-    <button onclick="window.location.href='/mint-scroll'">Mint Your Clone License</button>
+    <button onclick="mintScroll()">Mint Your Clone License</button>
+    <p id="walletStatus" style="margin-top: 15px; font-weight: bold;"></p>
   </div>
   <footer>
     <div class="container">
       <p>&copy; 2025 LuxoraNova Clone Licensing Engine</p>
     </div>
   </footer>
+
+  <script>
+    const contractAddress = "YOUR_CONTRACT_ADDRESS"; // replace with actual
+    const abi = [
+      "function mintScroll(string tokenURI) payable",
+      "function clonePrice() view returns (uint256)"
+    ];
+
+    async function mintScroll() {
+      const status = document.getElementById('walletStatus');
+
+      if (typeof window.ethereum !== 'undefined') {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
+        try {
+          const price = await contract.clonePrice();
+          const tx = await contract.mintScroll("ipfs://sample-token-uri", { value: price });
+          status.textContent = "Minting in progress...";
+          await tx.wait();
+          status.textContent = "Clone License minted successfully!";
+        } catch (err) {
+          console.error(err);
+          status.textContent = "Mint failed: " + err.message;
+        }
+      } else {
+        status.textContent = "MetaMask not detected.";
+      }
+    }
+  </script>
 </body>
 </html>
