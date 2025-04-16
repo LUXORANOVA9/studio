@@ -26,10 +26,11 @@ function useCopyToClipboard() {
     try {
       await navigator.clipboard.writeText(text);
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 3000); // Reset after 3 seconds
+      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+      return true;
     } catch (error) {
-      console.error("Copy failed:", error);
-      setIsCopied(false);
+      console.error("Failed to copy text: ", error);
+      return false;
     }
   };
 
@@ -135,22 +136,11 @@ const Page = () => {
   </header>
   <section class="container">
     <h2>Why License a LuxoraNova Clone?</h2>
-    <div class="feature">Pre-built AI Dashboards (LUXBot + SORA) out of the box.</div>
-    <div class="feature">White-label your own brand instantly.</div>
-    <div class="feature">NFT Scroll license + blockchain-backed verification.</div>
-    <div class="feature">Revenue-sharing model with low upfront cost.</div>
-    <div class="feature">Fully scalable Firebase + GitHub backend.</div>
-  </section>
-  <div class="cta">
-    <p>Ready to claim your territory?</p>
-    <button onclick="window.location.href='/mint-scroll'">Mint Your Clone License</button>
-  </div>
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 LuxoraNova Clone Licensing Engine</p>
-    </div>
-  </footer>
-</body>
+    
+
+  
+<html lang="en">
+
 </html>`;
     setHtmlCode(html);
     toast({
@@ -177,112 +167,106 @@ const Page = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-semibold mb-4">SaaS Landing Page Generator</h1>
-      <p>Enter your GitHub repository URL to generate a landing page.</p>
-
-      <div className="flex items-center mb-4">
-        <Input
-          type="text"
-          placeholder="GitHub Repository URL"
-          className="mr-2"
-          value={repoUrl}
-          onChange={handleRepoUrlChange}
-        />
-        <Button onClick={handleAnalyzeRepository} disabled={isAnalyzing}>
-          {isAnalyzing ? 'Analyzing...' : 'Analyze Repository'}
-        </Button>
-      </div>
-
-      {isAnalyzing && (
-        <Alert>
-          <AlertTitle>Analyzing Repository...</AlertTitle>
-          <AlertDescription>Please wait while we analyze the repository.</AlertDescription>
-        </Alert>
-      )}
-        {/* Display the "Generate Landing Page Copy" button */}
-        {!isAnalyzing && (
-          <Button
-            onClick={handleGenerateCopy}
-            disabled={isAnalyzing || isCopyGenerated}
-          >
-            Generate Landing Page Copy
-          </Button>
-        )}
+    
+      
+        
+          
+            
+              
+                SaaS Landing Page Generator
+              
+            
+            
+              Enter your GitHub repository URL to generate a landing page.
+            
+          
+          
+            
+              
+                
+              
+            
+            
+              Analyze Repository
+            
+          
+        
+      
 
       {isCopyGenerated && (
-        <div className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generated Copy</CardTitle>
-              <CardDescription>Review and regenerate sections as needed.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="headline">Headline</Label>
-                <div className="flex items-center">
-                  <Input id="headline" defaultValue={generatedCopy.headline} aria-label="Headline" readOnly />
-                  <Button variant="outline" size="icon" onClick={handleRegenerateHeadline} aria-label="Regenerate Headline">
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="subheadline">Subheadline</Label>
-                <Input id="subheadline" defaultValue={generatedCopy.subheadline} aria-label="Subheadline" readOnly />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="feature-descriptions">Feature Descriptions</Label>
-                {generatedCopy.featureDescriptions.map((feature, index) => (
-                  <Textarea
-                    key={index}
-                    defaultValue={feature}
-                    className="min-h-[80px]"
-                    aria-label="Feature Descriptions"
-                    readOnly
-                  />
-                ))}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="call-to-action">Call to Action</Label>
-                <Input id="call-to-action" defaultValue={generatedCopy.callToAction} aria-label="Call to Action" readOnly />
-              </div>
-            </CardContent>
-              <CardFooter className="flex justify-between items-center">
-                <Button onClick={handleGenerateHTML}>Generate HTML</Button>
-              </CardFooter>
-          </Card>
-        </div>
+        
+          
+            
+              
+                
+                  Headline
+                  
+                    
+                      {generatedCopy.headline}
+                    
+                    
+
+                     {
+                      // Simulate a state update to show button disabled
+                      onClick: handleRegenerateHeadline
+                    }
+                    >
+                      
+                    
+                  
+                
+              
+            
+            
+              
+                Subheadline
+                
+                  {generatedCopy.subheadline}
+                
+              
+            
+            
+              
+                Feature Descriptions
+                
+                  {generatedCopy.featureDescriptions.map((feature, index) => (
+                     aria-label="Feature Descriptions"
+                    />
+                  ))}
+                
+              
+            
+            
+              
+                Call to Action
+                
+                  {generatedCopy.callToAction}
+                
+              
+            
+          
+          
+            
+             setIsCopyGenerated(false)}
+            >Generate HTML
+          
+        
       )}
-       {isHtmlGenerated && (
-        <div className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generated HTML</CardTitle>
-              <CardDescription>Copy the HTML code below.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="generated-html">Generated HTML</Label>
-                <Textarea
-                  id="generated-html"
-                  defaultValue={htmlCode}
-                  className="min-h-[200px] font-mono text-sm"
-                  aria-label="Generated HTML"
-                  readOnly
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={handleCopyHTML} disabled={isCopied}>
-                {isCopied ? 'Copied!' : 'Copy HTML'}
-                <Copy className="ml-2 h-4 w-4" />
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+
+      {isHtmlGenerated && (
+        
+          
+            
+            
+              
+                Generated HTML
+                {htmlCode}
+                 setIsHtmlGenerated(false)}
+            >Copy HTML
+          
+        
       )}
-    </div>
+    
   );
 };
 
