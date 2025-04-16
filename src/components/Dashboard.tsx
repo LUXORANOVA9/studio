@@ -81,6 +81,14 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
                       </Link>
                   </div>
               )}
+               {/* Saas Landing Page Generator Link */}
+               <div className="mb-4">
+                  <Link href="/">
+                     <Button>
+                        Landing Page Generator
+                     </Button>
+                  </Link>
+               </div>
 
             {children}
         </div>
@@ -88,5 +96,3 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
 };
 
 export default Dashboard;
-
-
