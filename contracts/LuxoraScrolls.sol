@@ -1,4 +1,4 @@
-/// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
@@ -9,9 +9,9 @@ contract LuxoraNovaScrollLicense is ERC721URIStorage, Ownable {
     uint256 public clonePrice;
     address public revenueReceiver;
 
-    constructor(uint256 _clonePrice, address _receiver) ERC721("LuxoraNova License", "LUXCLONE") {
-        clonePrice = _clonePrice;
-        revenueReceiver = _receiver;
+    constructor() ERC721("LuxoraNova License", "LUXCLONE") {
+        clonePrice = 100 ether; // 100 MATIC
+        revenueReceiver = 0x984190d20714618138c8bd1e031c3678fc40dbb0;
     }
 
     function mintScroll(string memory tokenURI) external payable {
