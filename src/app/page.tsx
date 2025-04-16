@@ -1,9 +1,26 @@
-'use client';
-
 import { useState } from "react";
+import { ethers } from "ethers";
+
+const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
+const CONTRACT_ABI = [
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "cloneName",
+        type: "string"
+      }
+    ],
+    name: "mintLicense",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  }
+];
 
 export default function Page() {
   const [walletAddress, setWalletAddress] = useState("");
+  const [minting, setMinting] = useState(false);
 
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
@@ -15,6 +32,24 @@ export default function Page() {
       }
     } else {
       alert("Please install MetaMask or a Web3 wallet to continue.");
+    }
+  };
+
+  const handleMint = async (cloneName) => {
+    if (!walletAddress) return alert("Connect your wallet first");
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      setMinting(true);
+      const tx = await contract.mintLicense(cloneName);
+      await tx.wait();
+      alert(`${cloneName} license minted successfully!`);
+    } catch (err) {
+      console.error("Minting failed:", err);
+      alert("Minting failed. Check console for details.");
+    } finally {
+      setMinting(false);
     }
   };
 
@@ -39,7 +74,7 @@ export default function Page() {
           onClick={connectWallet}
           className="mt-10 px-8 py-4 text-lg font-bold rounded-2xl shadow-md bg-yellow-500 hover:bg-yellow-400 text-black transition-all duration-300"
         >
-          {walletAddress ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}` : "Mint Your License Now"}
+          {walletAddress ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}` : "Connect Wallet"}
         </button>
 
         <div className="mt-4 text-sm text-green-400">
@@ -61,8 +96,12 @@ export default function Page() {
               <p className="text-sm text-gray-300 mb-4">
                 License this powerful clone and launch instantly with your brand.
               </p>
-              <button className="mt-auto px-4 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-400">
-                Unlock License
+              <button
+                onClick={() => handleMint(title)}
+                className="mt-auto px-4 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-400 disabled:opacity-50"
+                disabled={minting}
+              >
+                {minting ? "Minting..." : "Unlock License"}
               </button>
             </div>
           ))}
