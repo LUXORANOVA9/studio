@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clone Licensing Store | LuxoraNova</title>
   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
     .container { width: 80%; margin: auto; overflow: hidden; }
     header { background: #1A237E; color: white; padding-top: 30px; min-height: 70px; border-bottom: #00BCD4 3px solid; }
-    header h1 { text-align: center; }
-    header p { text-align: center; }
+    header h1, header p { text-align: center; }
     section { padding: 20px; }
     .feature { border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; background: white; }
+    .cta { text-align: center; margin: 30px auto; }
+    .cta button { padding: 12px 24px; background-color: #00BCD4; border: none; color: white; font-size: 16px; cursor: pointer; border-radius: 4px; }
     footer { text-align: center; padding: 10px; margin-top: 20px; color: white; background-color: #1A237E; }
-    .cta { text-align: center; margin-top: 30px; }
-    .cta button { padding: 10px 20px; background-color: #00BCD4; border: none; color: white; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -35,14 +35,50 @@
   </section>
   <div class="cta">
     <p>Ready to claim your territory?</p>
-    <button onclick="window.location.href='/mint-scroll'">Mint Your Clone License</button>
+    <button onclick="mintScroll()">Mint Your Clone License</button>
+    <p id="walletStatus" style="margin-top: 15px; font-weight: bold;"></p>
   </div>
   <footer>
     <div class="container">
       <p>&copy; 2025 LuxoraNova Clone Licensing Engine</p>
     </div>
   </footer>
+
+  <script>
+    const contractAddress = "YOUR_CONTRACT_ADDRESS_HERE";
+    const abi = [
+      "function mintScroll(string tokenURI) payable",
+      "function clonePrice() view returns (uint256)"
+    ];
+
+    async function mintScroll() {
+      const status = document.getElementById('walletStatus');
+      if (typeof window.ethereum !== 'undefined') {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const wallet = await signer.getAddress();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
+        try {
+          const price = await contract.clonePrice();
+          const tx = await contract.mintScroll("ipfs://sample-token-uri", { value: price });
+          status.textContent = "Minting in progress...";
+          await tx.wait();
+          status.textContent = "✅ Clone License minted successfully!";
+
+          // Store license cert data
+          localStorage.setItem('mintedWallet', wallet);
+          localStorage.setItem('territory', 'Your Territory');
+          setTimeout(() => window.location.href = '/cert', 1000);
+        } catch (err) {
+          status.textContent = "❌ Mint failed: " + err.message;
+        }
+      } else {
+        status.textContent = "⚠️ MetaMask not detected.";
+      }
+    }
+  </script>
 </body>
 </html>
-
     
