@@ -1,4 +1,4 @@
-const { admin } = require('../auth/firebaseAdmin');
+const { admin, setUserRole } = require('../auth/firebaseAdmin');
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -8,6 +8,10 @@ exports.register = async (req, res) => {
       email: email,
       password: password,
     });
+
+    // Set default role to 'client'
+    const uid = userRecord.uid;
+    await setUserRole(uid, 'client');
 
     console.log('Successfully created new user:', userRecord.uid);
     res.status(201).send({ message: 'User created successfully', uid: userRecord.uid });

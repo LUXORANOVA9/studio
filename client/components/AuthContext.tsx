@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { FirebaseApp, initializeApp, getApps } from 'firebase/app';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User, getIdTokenResult } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { ethers } from 'ethers';
 
@@ -57,10 +57,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (user) {
                 setUser(user);
                 try {
-                    const role = await checkNftOwnership(user.uid);
-                    setUserRole(role);
+                  // Get JWT result to check custom claims (role)
+                  const idTokenResult = await getIdTokenResult(user);
+                  const role = idTokenResult.claims?.role as string || 'client';
+
+                  setUserRole(role);
                 } catch (error) {
-                    console.error("Error checking NFT ownership:", error);
+                    console.error("Error getting user role from JWT:", error);
                     setUserRole('client'); // Default role
                 }
             } else {
@@ -158,3 +161,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
     return useContext(AuthContext);
 };
+

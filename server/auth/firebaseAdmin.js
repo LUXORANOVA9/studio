@@ -26,4 +26,14 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-module.exports = { admin, verifyToken };
+// Function to set custom claims (roles) for users
+const setUserRole = async (uid, role) => {
+    try {
+        await admin.auth().setCustomUserClaims(uid, { role: role });
+        console.log(`Successfully set custom claims for user: ${uid} with role: ${role}`);
+    } catch (error) {
+        console.error("Error setting custom claims:", error);
+    }
+};
+
+module.exports = { admin, verifyToken, setUserRole };
