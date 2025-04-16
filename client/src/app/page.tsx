@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card"
 import { analyzeRepoContent } from '@/ai/flows/analyze-repo-content';
 import {generateLandingPageCopy} from '@/ai/flows/generate-landing-page-copy';
+import { Copy } from "lucide-react";
 
 const Page = () => {
   const [repoUrl, setRepoUrl] = React.useState('');
@@ -111,9 +112,7 @@ const Page = () => {
           
             
               {/* SaaS Landing Page Generator */}
-              
-                SaaS Landing Page Generator
-              
+              SaaS Landing Page Generator
             
           
         
