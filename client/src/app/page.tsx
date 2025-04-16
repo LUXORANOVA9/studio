@@ -13,6 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { analyzeRepoContent } from '@/ai/flows/analyze-repo-content';
+import {generateLandingPageCopy} from '@/ai/flows/generate-landing-page-copy';
 
 const Page = () => {
   const [repoUrl, setRepoUrl] = React.useState('');
@@ -29,30 +31,47 @@ const Page = () => {
 
   const handleAnalyzeRepository = async () => {
     setIsAnalyzing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setAnalysisResult({
-        name: 'Sample SaaS',
-        description: 'A description of the SaaS project.',
-        features: ['Feature 1', 'Feature 2'],
-        technologies: ['React', 'Node.js'],
-      });
+
+    try {
+      const analysisResult = await analyzeRepoContent({repoUrl: repoUrl});
+      setAnalysisResult(analysisResult);
       setIsAnalyzing(false);
-    }, 2000);
+    } catch (error) {
+      console.error("Error during repository analysis:", error);
+      setIsAnalyzing(false);
+      toast({
+        title: "Error during repository analysis",
+        description: "Please check the repository URL and try again.",
+        variant: "destructive",
+      })
+    }
   };
 
   const handleGenerateCopy = async () => {
     setIsGeneratingCopy(true);
-    // Simulate API call
-    setTimeout(() => {
-      setGeneratedCopy({
-        headline: 'Compelling Headline',
-        subheadline: 'Engaging Subheadline',
-        featureDescriptions: ['Feature 1 Description', 'Feature 2 Description'],
-        callToAction: 'Sign Up Now',
-      });
-      setIsGeneratingCopy(false);
-    }, 2000);
+    try {
+      if (analysisResult) {
+        const landingPageCopy = await generateLandingPageCopy({
+          repoInfo: {
+            name: analysisResult.name,
+            description: analysisResult.description,
+            url: repoUrl,
+            language: analysisResult.technologies.join(', '),
+            readmeContent: analysisResult.description,
+          },
+        });
+        setGeneratedCopy(landingPageCopy);
+        setIsGeneratingCopy(false);
+      }
+    } catch (error) {
+      console.error("Error generating landing page copy:", error);
+       setIsGeneratingCopy(false);
+        toast({
+          title: "Error generating landing page copy",
+          description: "Please try again.",
+          variant: "destructive",
+        })
+    }
   };
 
   const handleGenerateHtml = async () => {
@@ -91,8 +110,7 @@ const Page = () => {
         
           
             
-              {/* SaaS Landing Page Generator */}
-              <>SaaS Landing Page Generator</>
+              <CardTitle>SaaS Landing Page Generator</CardTitle>
             
           
         
