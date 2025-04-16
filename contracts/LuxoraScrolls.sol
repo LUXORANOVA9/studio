@@ -1,4 +1,4 @@
-"// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -13,63 +13,76 @@ contract LuxoraScrolls is ERC1155, Ownable {
     uint256 public constant TITANIUM = 3;
 
     string public baseURI;
-    uint256 public royaltyPercentage;
     address public luxoTokenAddress;
-    address public superAdmin; // Address to receive royalty payments
+    address public superAdmin;
 
-    constructor(string memory name, string memory symbol, string memory _baseURI, address _luxoTokenAddress) ERC1155("") {
+    mapping(uint256 => uint256) public scrollPrices;
+
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        string memory _baseURI,
+        address _luxoTokenAddress
+    ) ERC1155(_baseURI) {
         baseURI = _baseURI;
-        royaltyPercentage = 10; // 10% royalty
         luxoTokenAddress = _luxoTokenAddress;
+        _setSuperAdmin(_msgSender());
+
+        scrollPrices[GOLD] = 100 * 10 ** 18;       // 100 LUXO tokens
+        scrollPrices[PLATINUM] = 500 * 10 ** 18;   // 500 LUXO tokens
+        scrollPrices[TITANIUM] = 1000 * 10 ** 18;  // 1000 LUXO tokens
     }
 
-    function setSuperAdmin(address _superAdmin) public onlyOwner {
-        require(_superAdmin != address(0), "SuperAdmin address cannot be zero");
-        superAdmin = _superAdmin;
+    modifier onlySuperAdmin() {
+        require(_msgSender() == superAdmin, "Caller is not super admin");
+        _;
     }
 
-    function mint(address account, uint256 id, uint256 amount) public onlyOwner {
-        require(id >= GOLD && id <= TITANIUM, "Invalid scroll ID");
+    function setSuperAdmin(address _superAdmin) external onlyOwner {
+        _setSuperAdmin(_superAdmin);
+    }
+
+    function _setSuperAdmin(address _newSuperAdmin) internal {
+        superAdmin = _newSuperAdmin;
+    }
+
+    function setBaseURI(string memory _baseURI) external onlySuperAdmin {
+        baseURI = _baseURI;
+    }
+
+    function setScrollPrice(uint256 _id, uint256 _price) external onlySuperAdmin {
+        require(_id == GOLD || _id == PLATINUM || _id == TITANIUM, "Invalid scroll ID");
+        scrollPrices[_id] = _price;
+    }
+
+    function mint(address account, uint256 id, uint256 amount) external onlySuperAdmin {
+        require(id == GOLD || id == PLATINUM || id == TITANIUM, "Invalid scroll ID");
         _mint(account, id, amount, "");
     }
 
-    function burn(address account, uint256 id, uint256 amount) public onlyOwner {
-        require(id >= GOLD && id <= TITANIUM, "Invalid scroll ID");
-        _burn(account, id, amount);
-    }
-
-    function uri(uint256 id) public view override returns (string memory) {
-        require(id >= GOLD && id <= TITANIUM, "Invalid scroll ID");
-        return string(abi.encodePacked(baseURI, Strings.toString(id), ".json"));
-    }
-
-    function setBaseURI(string memory _baseURI) public onlyOwner {
-        baseURI = _baseURI;
-    }
-
-    function setRoyaltyPercentage(uint256 _royaltyPercentage) public onlyOwner {
-        require(_royaltyPercentage <= 100, "Royalty percentage cannot exceed 100");
-        royaltyPercentage = _royaltyPercentage;
+    function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts) external onlySuperAdmin {
+        _mintBatch(to, ids, amounts, "");
     }
 
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
-        internal
-        override
+        internal override
     {
-        require(operator == owner() || from == address(0) || to == address(0), "Only owner can transfer");
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155) returns (bool) {
-        return super.supportsInterface(interfaceId);
+    function uri(uint256 tokenId) public view override returns (string memory) {
+        require(tokenId == GOLD || tokenId == PLATINUM || tokenId == TITANIUM, "Invalid scroll ID");
+        return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
     }
 
-    function setLuxoTokenAddress(address _luxoTokenAddress) public onlyOwner {
-        require(_luxoTokenAddress != address(0), "LUXO Token address cannot be zero");
+    function setLuxoTokenAddress(address _luxoTokenAddress) external onlySuperAdmin {
         luxoTokenAddress = _luxoTokenAddress;
     }
 
-    function getLuxoTokenAddress() public view returns (address) {
-        return luxoTokenAddress;
+    function withdrawRoyalties() external onlySuperAdmin {
+      uint256 balance = address(this).balance;
+      payable(superAdmin).transfer(balance);
     }
+
+    receive() external payable {}
 }

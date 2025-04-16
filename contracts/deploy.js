@@ -1,4 +1,3 @@
-
 const hre = require("hardhat");
 require('dotenv').config();
 
@@ -43,4 +42,3 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
-
