@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
@@ -38,18 +38,32 @@ const db = getFirestore(app);
 export default function Page() {
   const [walletAddress, setWalletAddress] = useState("");
   const [minting, setMinting] = useState(false);
+  const [networkError, setNetworkError] = useState("");
+
+  useEffect(() => {
+    if (typeof window.ethereum !== "undefined") {
+      window.ethereum.on("accountsChanged", (accounts) => {
+        setWalletAddress(accounts[0] || "");
+      });
+      window.ethereum.on("chainChanged", () => window.location.reload());
+    }
+  }, []);
 
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x13881' }], // for Mumbai
-        });
+        const chainId = await window.ethereum.request({ method: "eth_chainId" });
+        if (chainId !== "0x13881") {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x13881" }], // Polygon Mumbai
+          });
+        }
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         setWalletAddress(accounts[0]);
       } catch (err) {
         console.error("Wallet connection failed:", err);
+        alert("Wallet connection failed. Check console for details.");
       }
     } else {
       alert("Please install MetaMask or a Web3 wallet to continue.");
@@ -59,18 +73,16 @@ export default function Page() {
   const handleMint = async (cloneName) => {
     if (!walletAddress) return alert("Connect your wallet first");
     try {
+      setMinting(true);
+      console.log(`Minting clone: ${cloneName}`);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      setMinting(true);
       const tx = await contract.mintLicense(cloneName);
+      console.log("Transaction sent:", tx.hash);
       await tx.wait();
-      await addDoc(collection(db, "mintedClones"), {
-        wallet: walletAddress,
-        clone: cloneName,
-        timestamp: new Date().toISOString()
-      });
-      alert(`${cloneName} license minted & saved to Firestore!`);
+      console.log("Transaction confirmed.");
+      alert(`${cloneName} license minted successfully!`);
     } catch (err) {
       console.error("Minting failed:", err);
       alert("Minting failed. Check console for details.");
