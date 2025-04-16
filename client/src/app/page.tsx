@@ -42,6 +42,10 @@ export default function Page() {
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x13881' }], // for Mumbai
+        });
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         setWalletAddress(accounts[0]);
       } catch (err) {
@@ -115,13 +119,13 @@ export default function Page() {
           {["AI Scheduler", "Crypto Terminal", "Auto CRM"].map((title, index) => (
             <motion.div
               key={index}
-              className="bg-[#1e1b2f] rounded-2xl p-6 shadow-xl border-2 border-yellow-400 hover:scale-105 transform transition-all duration-300"
+              className="bg-[#1e1b2f] rounded-2xl p-6 shadow-xl border-2 border-yellow-400 hover:scale-105 transition-transform duration-300"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <h3 className="text-xl font-semibold text-yellow-400 mb-2 flex justify-between">
+              <h3 className="text-xl font-semibold text-yellow-300 mb-2 flex justify-between">
                 <span>{title}</span>
                 <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs px-3 py-1 rounded-full animate-pulse">
                   Rare

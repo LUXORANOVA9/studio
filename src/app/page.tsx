@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { ethers } from "ethers";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { motion } from "framer-motion";
 
 const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
 const CONTRACT_ABI = [
@@ -20,6 +23,18 @@ const CONTRACT_ABI = [
   }
 ];
 
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "luxoranova9",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 export default function Page() {
   const [walletAddress, setWalletAddress] = useState("");
   const [minting, setMinting] = useState(false);
@@ -27,6 +42,10 @@ export default function Page() {
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x13881' }], // for Mumbai
+        });
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         setWalletAddress(accounts[0]);
       } catch (err) {
@@ -46,7 +65,12 @@ export default function Page() {
       setMinting(true);
       const tx = await contract.mintLicense(cloneName);
       await tx.wait();
-      alert(`${cloneName} license minted successfully!`);
+      await addDoc(collection(db, "mintedClones"), {
+        wallet: walletAddress,
+        clone: cloneName,
+        timestamp: new Date().toISOString()
+      });
+      alert(`${cloneName} license minted & saved to Firestore!`);
     } catch (err) {
       console.error("Minting failed:", err);
       alert("Minting failed. Check console for details.");
@@ -93,8 +117,20 @@ export default function Page() {
         <h2 className="text-3xl font-bold text-center mb-12 text-yellow-300">Choose Your Clone</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {["AI Scheduler", "Crypto Terminal", "Auto CRM"].map((title, index) => (
-            <div key={index} className="bg-[#1e1b2f] rounded-2xl p-6 shadow-lg border border-yellow-500 hover:scale-105 transform transition-all duration-300">
-              <h3 className="text-xl font-semibold text-yellow-400 mb-2">{title}</h3>
+            <motion.div
+              key={index}
+              className="bg-[#1e1b2f] rounded-2xl p-6 shadow-xl border-2 border-yellow-400 hover:scale-105 transition-transform duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+            >
+              <h3 className="text-xl font-semibold text-yellow-300 mb-2 flex justify-between">
+                <span>{title}</span>
+                <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs px-3 py-1 rounded-full animate-pulse">
+                  Rare
+                </span>
+              </h3>
               <p className="text-sm text-gray-300 mb-4">
                 License this powerful clone and launch instantly with your brand.
               </p>
@@ -105,7 +141,7 @@ export default function Page() {
               >
                 {minting ? "Minting..." : "Unlock License"}
               </button>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
