@@ -124,16 +124,16 @@ const Page = () => {
             
               
                 
-                  Headline:
+                  <span>Headline:</span>
                 
                 
-                  Subheadline: {analysisResult.description}
+                  <span>Subheadline:</span>
                 
                 
-                  Feature Descriptions:
+                  <span>Feature Descriptions:</span>
                 
                 
-                  Call to Action:
+                  <span>Call to Action:</span>
                 
               
               
