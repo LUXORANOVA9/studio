@@ -6,6 +6,10 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { toast } from '@/hooks/use-toast';
+import { Copy, RefreshCw } from 'lucide-react';
+import { useCopyToClipboard } from 'usehooks-ts';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Github } from 'lucide-react';
 
 const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
 const CONTRACT_ABI = [
@@ -40,6 +44,12 @@ export default function Page() {
   const [walletAddress, setWalletAddress] = useState("");
   const [minting, setMinting] = useState(false);
   const [networkError, setNetworkError] = useState("");
+  const [mintReceiptModalOpen, setMintReceiptModalOpen] = useState(false);
+  const [txHash, setTxHash] = useState("");
+  const [cloneName, setCloneName] = useState("");
+  const [priceInEth, setPriceInEth] = useState("");
+  const [repoUrl, setRepoUrl] = useState('');
+  const [value, copy] = useCopyToClipboard();
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -65,7 +75,7 @@ export default function Page() {
             if (switchError.code === 4902) {
               alert("Please add Polygon Mumbai to your MetaMask");
             }
-            console.error("Failed to switch to the network", switchError);
+            console.error("Failed to switch to the network", switchError.message);
             return;
           }
         }
@@ -102,6 +112,9 @@ export default function Page() {
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       const tx = await contract.mintLicense(cloneName);
       console.log("Transaction sent:", tx.hash);
+      setTxHash(tx.hash);
+      setCloneName(cloneName);
+      setPriceInEth("100"); // Replace with actual price fetching
       await tx.wait();
       console.log("Transaction confirmed.");
       toast({
