@@ -1,198 +1,136 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { motion } from "framer-motion";
-import { toast } from '@/hooks/use-toast';
-import { Copy, RefreshCw } from 'lucide-react';
-import { useCopyToClipboard } from 'usehooks-ts';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Github } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
-const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
-const CONTRACT_ABI = [
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "cloneName",
-        type: "string"
-      }
-    ],
-    name: "mintLicense",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function"
-  }
-];
+function isUUID(str) {
+  return typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+}
 
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "luxoranova9",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+function isSlug(str) {
+  return typeof str === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(str);
+}
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+function slugToTitle(slug) {
+  return typeof slug === 'string'
+    ? slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : '';
+}
 
-export default function Page() {
-  const [walletAddress, setWalletAddress] = useState("");
-  const [minting, setMinting] = useState(false);
-  const [networkError, setNetworkError] = useState("");
-  const [mintReceiptModalOpen, setMintReceiptModalOpen] = useState(false);
-  const [txHash, setTxHash] = useState("");
-  const [cloneName, setCloneName] = useState("");
-  const [priceInEth, setPriceInEth] = useState("");
-  const [repoUrl, setRepoUrl] = useState('');
-  const [value, copy] = useCopyToClipboard();
-
-  useEffect(() => {
-    if (typeof window.ethereum !== "undefined") {
-      window.ethereum.on("accountsChanged", (accounts) => {
-        setWalletAddress(accounts[0] || "");
-      });
-      window.ethereum.on("chainChanged", () => window.location.reload());
-    }
-  }, []);
-
-  const connectWallet = async () => {
-    if (typeof window.ethereum !== "undefined") {
+async function connectWallet() {
+  try {
+    const chainId = '0x13881';
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId }]
+    });
+  } catch (switchError) {
+    if (switchError.code === 4902) {
       try {
-        const chainId = await window.ethereum.request({ method: "eth_chainId" });
-        if (chainId !== "0x13881") {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x13881" }], // Polygon Mumbai
-          });
-        }
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-        setWalletAddress(accounts[0]);
-      } catch (err) {
-        console.error("Wallet connection failed:", err);
-        alert("Wallet connection failed. Check console for details.");
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x13881',
+              chainName: 'Polygon Mumbai Testnet',
+              nativeCurrency: {
+                name: 'MATIC',
+                symbol: 'MATIC',
+                decimals: 18
+              },
+              rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+              blockExplorerUrls: ['https://mumbai.polygonscan.com/']
+            }
+          ]
+        });
+      } catch (addError) {
+        console.error('Failed to add Polygon Mumbai network', addError);
       }
     } else {
-      alert("Please install MetaMask or a Web3 wallet to continue.");
+      console.error('Failed to switch to the network', switchError.message);
     }
-  };
+  }
+}
 
-  const handleMint = async (cloneName) => {
-    if (!walletAddress) {
-      toast({
-        title: "Error",
-        description: "Connect your wallet first",
-        variant: "destructive",
-      });
+export default function HydratedParamsPage() {
+  const rawParams = useParams();
+  const router = useRouter();
+
+  const params = useMemo(() => {
+    return rawParams && typeof rawParams === 'object' ? { ...rawParams } : {};
+  }, [rawParams]);
+
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [invalid, setInvalid] = useState(false);
+
+  useEffect(() => {
+    const userId = params?.userId;
+
+    if (!userId || typeof userId !== 'string' || (!isUUID(userId) && !isSlug(userId))) {
+      console.warn("Invalid userId:", userId);
+      setInvalid(true);
       return;
     }
 
-    try {
-      setMinting(true);
-      console.log(`Minting clone: ${cloneName}`);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      const tx = await contract.mintLicense(cloneName);
-      console.log("Transaction sent:", tx.hash);
-      setTxHash(tx.hash);
-      setCloneName(cloneName);
-      setPriceInEth("100"); // Replace with actual price fetching
-      await tx.wait();
-      console.log("Transaction confirmed.");
-      toast({
-        title: "Success",
-        description: `${cloneName} license minted successfully!`,
-      });
-    } catch (err) {
-      console.error("Minting failed:", err);
-      toast({
-        title: "Error",
-        description: "Minting failed. Check console for details.",
-        variant: "destructive",
-      });
-    } finally {
-      setMinting(false);
-    }
-  };
+    const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
+
+    fetch(`/api/users/${userLabel}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Not found');
+        return res.json();
+      })
+      .then((data) => setUserData(data))
+      .catch(() => setInvalid(true))
+      .finally(() => setLoading(false));
+  }, [params]);
+
+  if (invalid) return (
+    <div className="p-8 text-center text-red-500">
+      Invalid or Missing User ID
+      <div className="mt-4">
+        <button
+          onClick={() => router.push('/')}
+          className="bg-black text-white px-4 py-2 rounded mr-2"
+        >
+          Go Home
+        </button>
+        <button
+          onClick={() => router.refresh()}
+          className="bg-gray-700 text-white px-4 py-2 rounded"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+  );
+
+  if (loading) return <div className="p-8 text-center">Loading user...</div>;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0e0e2c] via-[#1c1246] to-[#240b36] text-white font-sans px-6 py-16 flex flex-col items-center">
-      <div className="max-w-4xl text-center">
-        <img
-          src="/logo.svg"
-          alt="LuxoraNova Logo"
-          className="h-12 mx-auto mb-8 animate-fade-in"
-        />
-
-        <h1 className="text-4xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500">
-          Build Your Clone Empire
-        </h1>
-
-        <p className="mt-6 text-lg md:text-xl text-gray-300 max-w-xl mx-auto">
-          Launch fully automated, white-labeled SaaS products backed by our AI engines — the fastest way to scale your digital throne.
-        </p>
-
-        <button
-          onClick={connectWallet}
-          className="mt-10 px-8 py-4 text-lg font-bold rounded-2xl shadow-md bg-yellow-500 hover:bg-yellow-400 text-black transition-all duration-300"
-        >
-          {walletAddress ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}` : "Connect Wallet"}
-        </button>
-
-        <div className="mt-4 text-sm text-green-400">
-          {walletAddress && "Wallet connected successfully!"}
-        </div>
-
-        <div className="mt-12 text-sm text-gray-500">
-          Powered by <span className="text-white font-semibold">LuxoraNova</span> | LUXBot Engine | Web3 Ready
-        </div>
-      </div>
-
-      {/* Scrollstorm Clone Store Preview */}
-      <section className="w-full mt-24 px-4 md:px-16">
-        <h2 className="text-3xl font-bold text-center mb-12 text-yellow-300">Choose Your Clone</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {["AI Scheduler", "Crypto Terminal", "Auto CRM"].map((title, index) => (
-            <motion.div
-              key={index}
-              className="bg-[#1e1b2f] rounded-2xl p-6 shadow-xl border-2 border-yellow-400 hover:scale-105 transition-transform duration-300"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <h3 className="text-xl font-semibold text-yellow-300 mb-2 flex justify-between">
-                <span>{title}</span>
-                <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs px-3 py-1 rounded-full animate-pulse">
-                  Rare
-                </span>
-              </h3>
-              <p className="text-sm text-gray-300 mb-4">
-                License this powerful clone and launch instantly with your brand.
-              </p>
-              <button
-                onClick={() => handleMint(title)}
-                className="mt-auto px-4 py-2 rounded-full bg-yellow-500 text-black font-bold hover:bg-yellow-400 disabled:opacity-50"
-                disabled={minting}
-              >
-                {minting ? "Minting..." : "Unlock License"}
-              </button>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Floating LUXBot */}
-      <div className="fixed bottom-6 right-6 animate-fade-in">
-        <button className="bg-[#ffeb3b] text-black px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform">
-          💬 Ask LUXBot
-        </button>
-      </div>
-    </main>
+    <div className="p-8">
+      <h1 className="text-xl font-bold">User Profile</h1>
+      <button onClick={connectWallet} className="bg-indigo-600 text-white px-4 py-2 rounded mb-4">Connect Wallet</button>
+      {userData ? (
+        <pre className="bg-gray-100 p-4 rounded text-sm mt-2">
+          {JSON.stringify(userData, null, 2)}
+        </pre>
+      ) : (
+        <div className="text-red-500">User Not Found</div>
+      )}
+    </div>
   );
+}
+
+export async function generateStaticParams() {
+  return [];
+}
+
+export async function notFound() {
+  return {
+    redirect: {
+      destination: '/404',
+      permanent: false
+    }
+  };
 }
