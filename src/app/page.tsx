@@ -10,13 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
 const CONTRACT_ABI = [
@@ -114,20 +115,20 @@ export default function Page() {
     });
   }
 
-  const handleCreateSyndicate = () => {
-    // TODO: Implement syndicate creation logic (API call)
-    console.log(`Creating syndicate with name: ${syndicateName} and description: ${syndicateDescription}`);
-    setIsSyndicateDialogOpen(false);
-};
-
-    const mintClone = async () => {
-        try {
-            const signer = await connectWallet();
-            await mintLicense("AI Scheduler", signer);
-        } catch (e) {
-            console.error("Minting process failed", e);
-        }
-    };
+  const handleRegenerateHeadline = async () => {
+    setRegenerateHeadlineLoading(true);
+    try {
+      // Simulate generating new headline (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Here you would update the headline state with the new value
+      toast({
+        title: "New headline generated!",
+        description: "A new headline has been generated",
+      });
+    } finally {
+      setRegenerateHeadlineLoading(false);
+    }
+  };
 
   const handleGenerateHTML = async () => {
     setIsGeneratingHtml(true);
@@ -139,8 +140,6 @@ export default function Page() {
     }, 1500);
   };
 
-  const [isGeneratingHtml, setIsGeneratingHtml] = useState(false);
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -149,57 +148,64 @@ export default function Page() {
     });
   };
 
+  const [isGeneratingHtml, setIsGeneratingHtml] = useState(false);
+
+  const mintClone = async () => {
+        try {
+            const signer = await connectWallet();
+            await mintLicense("AI Scheduler", signer);
+        } catch (e) {
+            console.error("Minting process failed", e);
+        }
+    };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl font-mono text-sm lg:flex flex-col gap-4 items-center">
         <h1 className="text-3xl font-bold text-center">
           SaaS Landing Page Generator
         </h1>
-              <div>
-          <Link href="/">
-             <Button>
-                Home
-             </Button>
-          </Link>
-               </div>
-<Dialog open={isSyndicateDialogOpen} onOpenChange={setIsSyndicateDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button>Create Syndicate</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Create New Syndicate</DialogTitle>
-                            <DialogDescription>
-                                Enter the details for your new investment syndicate.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="name" className="text-right">
-                                    Syndicate Name
-                                </Label>
-                                <Input
-                                    id="name"
-                                    value={syndicateName}
-                                    onChange={(e) => setSyndicateName(e.target.value)}
-                                    className="col-span-3"
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="description" className="text-right">
-                                    Description
-                                </Label>
-                                <Input
-                                    id="description"
-                                    value={syndicateDescription}
-                                    onChange={(e) => setSyndicateDescription(e.target.value)}
-                                    className="col-span-3"
-                                />
-                            </div>
-                        </div>
-                        <Button onClick={handleCreateSyndicate}>Create syndicate</Button>
-                    </DialogContent>
-                </Dialog>
+
+        
+          
+             Home
+          
+        
+
+        {/* Create Syndicate Button and Dialog */}
+        
+            
+              Create Syndicate
+            
+          
+          
+            
+              
+                Create New Syndicate
+              
+              
+                Enter the details for your new investment syndicate.
+              
+            
+            
+              
+                
+                  Syndicate Name
+                
+                
+              
+              
+                
+                  Description
+                
+                
+              
+            
+          
+          
+            Create syndicate
+          
+        
       </div>
     </main>
   );
