@@ -1,18 +1,14 @@
 'use client';
-
-import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 
 export default function Page() {
-  const rawParams = useParams();
+  const rawSearchParams = useSearchParams();
 
-  const params = useMemo(() => {
-    return rawParams && typeof rawParams === 'object' ? { ...rawParams } : {};
-  }, [rawParams]);
+  const searchParams = useMemo(() => {
+    const entries = rawSearchParams?.entries?.();
+    return entries ? Object.fromEntries(entries) : {};
+  }, [rawSearchParams]);
 
-  return (
-    <pre>
-      {JSON.stringify(params, null, 2)}
-    </pre>
-  );
+  return <div>{searchParams?.ref}</div>;
 }
