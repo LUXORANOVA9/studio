@@ -2,204 +2,142 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { toast } from '@/hooks/use-toast';
-import {Copy, RefreshCw} from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import {Github} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form"
-import * as z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import React from "react"
-import { motion } from "framer-motion";
 
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-})
+function isUUID(str) {
+  return typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+}
 
-async function copyText(textToCopy) {
-  if (!navigator.clipboard) {
-    return alert('Clipboard not supported')
-  }
+function isSlug(str) {
+  return typeof str === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(str);
+}
 
+function slugToTitle(slug) {
+  return typeof slug === 'string'
+    ? slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : '';
+}
+
+async function connectWallet() {
   try {
-    await navigator.clipboard.writeText(textToCopy)
-    toast({
-      title: "Copied!",
-      description: "URL copied to clipboard."
-    })
-  } catch (error) {
-    console.log("ERR", error)
-    return alert('Copy failed')
+    const chainId = '0x13881';
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId }]
+    });
+  } catch (switchError) {
+    if (switchError.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x13881',
+              chainName: 'Polygon Mumbai Testnet',
+              nativeCurrency: {
+                name: 'MATIC',
+                symbol: 'MATIC',
+                decimals: 18
+              },
+              rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+              blockExplorerUrls: ['https://mumbai.polygonscan.com/']
+            }
+          ]
+        });
+      } catch (addError) {
+        console.error('Failed to add Polygon Mumbai network', addError);
+      }
+    } else {
+      console.error('Failed to switch to the network', switchError.message);
+    }
   }
 }
 
-async function generateOpenGraphImage() {
-  const response = await fetch(
-    `/api/og?title=${encodeURIComponent('asdf')}`
+export default function HydratedParamsPage() {
+  const rawParams = useParams();
+  const router = useRouter();
+
+  const params = useMemo(() => {
+    return rawParams && typeof rawParams === 'object' ? { ...rawParams } : {};
+  }, [rawParams]);
+
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [invalid, setInvalid] = useState(false);
+
+  useEffect(() => {
+    if (!params || !params.userId) {
+      setInvalid(true);
+      return;
+    }
+
+    const userId = params?.userId;
+
+    if (!userId || typeof userId !== 'string' || (!isUUID(userId) && !isSlug(userId))) {
+      console.warn("Invalid userId:", userId);
+      setInvalid(true);
+      const timer = setTimeout(() => router.push('/'), 10000);
+      return () => clearTimeout(timer);
+    }
+
+    const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
+
+    fetch(`/api/users/${userLabel}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Not found');
+        return res.json();
+      })
+      .then((data) => setUserData(data))
+      .catch(() => setInvalid(true))
+      .finally(() => setLoading(false));
+  }, [params, router]);
+
+  if (invalid) return (
+    <div className="p-8 text-center text-red-500">
+      <img src="/logo.svg" alt="LuxoraNova Logo" className="mx-auto mb-4 w-24 h-24" />
+      Invalid or Missing User ID
+      <div className="mt-4">
+        <button
+          onClick={() => router.push('/')}
+          className="bg-gradient-to-r from-yellow-500 to-yellow-300 text-black px-5 py-2 rounded-lg shadow-md hover:opacity-90 mr-2"
+        >
+          Go Home
+        </button>
+        <button
+          onClick={() => router.refresh()}
+          className="bg-gray-700 text-white px-5 py-2 rounded-lg shadow-md hover:bg-gray-600"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
   );
 
-  if (response.ok) {
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-  }
-}
-
-export default function Page() {
-  const [repoUrl, setRepoUrl] = React.useState('');
-  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [generatedCopy, setGeneratedCopy] = React.useState(null);
-  const [generatedHtml, setGeneratedHtml] = React.useState('');
-  const [copySuccess, setCopySuccess] = useState(false);
-  const [isGeneratingHtml, setIsGeneratingHtml] = React.useState(false);
-  const [regenerateHeadlineLoading, setRegenerateHeadlineLoading] = React.useState(false);
-
-  const handleUrlChange = (event) => {
-    setRepoUrl(event.target.value);
-  };
-
-  const handleAnalyzeRepository = async () => {
-    setIsAnalyzing(true);
-
-    // Simulate some async operation.
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setGeneratedCopy({
-        headline: 'Headline',
-        subheadline: 'Subheadline',
-        featureDescriptions: ['Description 1', 'Description 2', 'Description 3'],
-        callToAction: 'Call to action'
-      });
-    }, 1500);
-  };
-
-  const handleGenerateCopy = async () => {
-    // Simulate generating copy and enabling "Generate HTML" button
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate async
-    toast({
-      title: "Copy generated!",
-      description: "Landing page copy generated. Now you can generate HTML"
-    });
-  }
-
-  const handleRegenerateHeadline = async () => {
-    setRegenerateHeadlineLoading(true);
-    try {
-      // Simulate generating new headline (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      // Here you would update the headline state with the new value
-      toast({
-        title: "New headline generated!",
-        description: "A new headline has been generated",
-      });
-    } finally {
-      setRegenerateHeadlineLoading(false);
-    }
-  };
-
-  const handleGenerateHTML = async () => {
-    setIsGeneratingHtml(true);
-
-    // Simulate some async operation.
-    setTimeout(() => {
-      setIsGeneratingHtml(false);
-      setGeneratedHtml('HTML Code Generated!');
-    }, 1500);
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "HTML copied to clipboard!",
-      description: "The generated html has been copied."
-    });
-  };
+  if (loading) return <div className="p-8 text-center">Loading user...</div>;
 
   return (
-    
-       
-        
-          SaaS Landing Page Generator
-        
-      
-
-      
-        
-          Subheadline
-        
-        
-          Build and deploy beautiful landing pages in seconds with AI-powered templates and one-click integrations.
-        
-        
-          Feature Descriptions
-        
-        
-          <li>Drag &amp; drop builder</li>
-          <li>Mobile-responsive out of the box</li>
-          <li>AI-generated content suggestions</li>
-        
-      
-    
-
-      
-        Enter your GitHub repository URL to generate a landing page.
-      
-     
-
-      
-        Analyze Repository
-      
-     
-
-      
-        Subheadline:
-      
-    
-    
-       Feature Descriptions:
-      
-    
-    
-       Call to Action:
-      
-    
-
-      
-        Generate HTML
-      
-    
-
-      
-        Generated HTML
-      
-    
-    
-       Copy HTML
-      
-    
-
-    
-       Regenerate
-      
-    
+    <div className="p-8">
+      <h1 className="text-xl font-bold">User Profile</h1>
+      <button onClick={connectWallet} className="bg-indigo-600 text-white px-4 py-2 rounded mb-4">Connect Wallet</button>
+      {userData ? (
+        <pre className="bg-gray-100 p-4 rounded text-sm mt-2">
+          {JSON.stringify(userData, null, 2)}
+        </pre>
+      ) : (
+        <div className="text-red-500">User Not Found</div>
+      )}
+    </div>
   );
+}
+
+export async function generateStaticParams() {
+  return [];
+}
+
+export async function notFound() {
+  return {
+    redirect: {
+      destination: '/404',
+      permanent: false
+    }
+  };
 }
