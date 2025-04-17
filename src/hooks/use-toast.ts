@@ -3,7 +3,7 @@ import * as React from "react";
 // --- Correction is here ---
 // Import `useToast` from the correct path: '@/components/ui/toast'
 // Also, keep the alias `useShadcnToast` if you intend to use that name internally.
-import useShadcnToast from "@/components/ui/toast";
+import { useToast as useShadcnToast } from "@/components/ui/toast";
 // --- End of Correction ---
 
 // Assuming the rest of your hook implementation follows, for example:
