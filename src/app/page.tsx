@@ -16,6 +16,12 @@ export default function FallbackView() {
   const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
+    if (countdown <= 0) {
+      router.push('/');
+    }
+  }, [countdown, router]);
+
+  useEffect(() => {
     fetch('https://luxoranova-fallback.firebaseio.com/logs.json', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -24,7 +30,6 @@ export default function FallbackView() {
 
     const interval = setInterval(() => {
       setCountdown((c) => {
-        if (c === 1) router.push('/');
         return c - 1;
       });
     }, 1000);
@@ -55,7 +60,7 @@ export default function FallbackView() {
         </button>
         <button
           onClick={() => router.refresh()}
-          className="bg-black text-white px-5 py-2 rounded-lg shadow-md hover:bg-gray-700"
+          className="bg-black text-white px-5 py-2 rounded-lg shadow-md hover:bg-gray-600"
         >
           Retry
         </button>
