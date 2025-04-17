@@ -1,22 +1,12 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-function isUUID(str) {
-  return str && typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-}
-
-function isSlug(str) {
-  return str && typeof str === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(str);
-}
-
-function slugToTitle(slug) {
-  return typeof slug === 'string'
-    ? slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-    : '';
-}
+import { isUUID, isSlug, slugToTitle } from '../lib/utils';
+import toast from 'react-hot-toast';
+import { ethers } from 'ethers';
+import FallbackView from './fallback';
 
 async function connectWallet() {
   try {
@@ -25,31 +15,55 @@ async function connectWallet() {
       method: 'wallet_switchEthereumChain',
       params: [{ chainId }]
     });
-  } catch (switchError) {
-    if (switchError.code === 4902) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x13881',
-              chainName: 'Polygon Mumbai Testnet',
-              nativeCurrency: {
-                name: 'MATIC',
-                symbol: 'MATIC',
-                decimals: 18
-              },
-              rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
-              blockExplorerUrls: ['https://mumbai.polygonscan.com/']
-            }
-          ]
-        });
-      } catch (addError) {
-        console.error('Failed to add Polygon Mumbai network', addError);
-      }
-    } else {
-      console.error('Failed to switch to the network', switchError.message);
-    }
+    toast.success('Connected to Mumbai');
+    return new ethers.providers.Web3Provider(window.ethereum).getSigner();
+  } catch (err) {
+    toast.error('Wallet connection failed');
+    console.error("Connect Wallet Error", err);
+    throw err;
+  }
+}
+
+async function mintLicense(cloneName, signer) {
+  try {
+    const contract = new ethers.Contract(
+      '0x984190d20714618138C8bD1E031C3678FC40dbB0',
+      [
+        {
+          inputs: [{ internalType: 'string', name: 'cloneName', type: 'string' }],
+          name: 'mintLicense',
+          outputs: [],
+          stateMutability: 'payable',
+          type: 'function'
+        }
+      ],
+      signer
+    );
+    const tx = await contract.mintLicense(cloneName, {
+      value: ethers.utils.parseEther('0.01')
+    });
+    await tx.wait();
+    toast.success('License Minted!');
+    await fetch('https://luxoranova-fallback.firebaseio.com/mints.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cloneName, txHash: tx.hash, time: new Date().toISOString() })
+    });
+  } catch (err) {
+    toast.error('Mint failed');
+    console.error("Mint License Error", err);
+  }
+}
+
+async function logFallbackHit(userId) {
+  try {
+    await fetch('https://luxoranova-fallback.firebaseio.com/logs.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, timestamp: new Date().toISOString() })
+    });
+  } catch (err) {
+    console.warn('Failed to log fallback hit:', err);
   }
 }
 
@@ -64,69 +78,75 @@ export default function HydratedParamsPage() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [invalid, setInvalid] = useState(false);
-    const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
-    const userId = params?.userId;
+      const fetchUserData = async () => {
+        try {
+          const userId = params?.userId;
 
-    if (!userId || typeof userId !== 'string' || (!isUUID(userId) && !isSlug(userId))) {
-      console.warn("Invalid userId:", userId);
-      setInvalid(true);
+          if (!userId || typeof userId !== 'string' || (!isUUID(userId) && !isSlug(userId))) {
+            console.warn("Invalid userId:", userId);
+            setInvalid(true);
+            return;
+          }
 
-      const timer = setTimeout(() => {
-        router.push('/');
-      }, 10000);
+          const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
 
-      return () => clearTimeout(timer);
-    }
+          const res = await fetch(`/api/users/${userLabel}`);
 
-    const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
+          if (!res.ok) {
+            console.error(`Failed to fetch user data: ${res.status} ${res.statusText}`);
+            throw new Error('User not found');
+          }
 
-    fetch(`/api/users/${userLabel}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Not found');
-        return res.json();
-      })
-      .then((data) => setUserData(data))
-      .catch(() => setInvalid(true))
-      .finally(() => setLoading(false));
-  }, [params, router]);
+          const data = await res.json();
+          setUserData(data);
+        } catch (error) {
+          console.error("API fetch failed:", error);
+          setUserData(null);
+          setInvalid(true);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-  if (invalid) return (
-    <div className="p-8 text-center text-red-500">
-      <img src="/logo.svg" alt="LuxoraNova Logo" className="mx-auto mb-4 w-24 h-24" />
-      Invalid or Missing User ID
-      <div className="mt-4">
-        <button
-          onClick={() => router.push('/')}
-          className="bg-gradient-to-r from-yellow-500 to-yellow-300 text-black px-5 py-2 rounded-lg shadow-md hover:opacity-90 mr-2"
-        >
-          Go Home
-        </button>
-        <button
-          onClick={() => router.refresh()}
-          className="bg-gray-700 text-white px-5 py-2 rounded-lg shadow-md hover:bg-gray-600"
-        >
-          Retry
-        </button>
+      if (params?.userId) {
+        fetchUserData();
+      }
+    }, [params, router]);
+
+  if (invalid) return <FallbackView />;
+
+  if (loading) {
+    return (
+      <div className="p-8 text-center text-gray-500 animate-pulse">
+        <div className="h-6 w-48 bg-gray-300 rounded mb-4 mx-auto" />
+        <div className="space-y-2">
+          <div className="h-4 w-full bg-gray-200 rounded" />
+          <div className="h-4 w-full bg-gray-200 rounded" />
+          <div className="h-4 w-5/6 bg-gray-200 rounded" />
+        </div>
       </div>
-    </div>
-  );
-
-  if (loading) return <div className="p-8 text-center">Loading user...</div>;
+    );
+  }
 
   return (
-    <div className="p-8">
+    <motion.div className="p-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
       <h1 className="text-xl font-bold">User Profile</h1>
-      <button onClick={connectWallet} className="bg-indigo-600 text-white px-4 py-2 rounded mb-4">Connect Wallet</button>
-      {userData ? (
-        <pre className="bg-gray-100 p-4 rounded text-sm mt-2">
-          {JSON.stringify(userData, null, 2)}
-        </pre>
-      ) : (
-        <div className="text-red-500">User Not Found</div>
-      )}
-    </div>
+      <button onClick={async () => {
+        try {
+          const signer = await connectWallet();
+          await mintLicense(userData?.name || 'AI Scheduler', signer);
+        } catch (e) {
+          console.error("Minting process failed", e);
+        }
+      }} className="bg-indigo-600 text-white px-4 py-2 rounded mb-4">Mint License</button>
+      <div className="bg-white rounded-xl shadow p-6 mt-4 text-left space-y-2">
+        <div><strong>Name:</strong> {userData?.name || ''}</div>
+        <div><strong>Email:</strong> {userData?.email || 'Not available'}</div>
+        <div><strong>Bio:</strong> {userData?.bio || 'No bio available'}</div>
+      </div>
+    </motion.div>
   );
 }
 
