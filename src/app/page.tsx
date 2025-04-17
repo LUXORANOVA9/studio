@@ -1,12 +1,33 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { isUUID, isSlug, slugToTitle } from '../lib/utils';
-import toast from 'react-hot-toast';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { ethers } from 'ethers';
-import FallbackView from './fallback';
+import { isUUID, isSlug, slugToTitle } from '../lib/utils';
+import { toast } from '@/hooks/use-toast';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
+const CONTRACT_ABI = [
+  {
+    inputs: [{ internalType: 'string', name: 'cloneName', type: 'string' }],
+    name: 'mintLicense',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function'
+  }
+];
 
 async function connectWallet() {
   try {
@@ -19,7 +40,6 @@ async function connectWallet() {
     return new ethers.providers.Web3Provider(window.ethereum).getSigner();
   } catch (err) {
     toast.error('Wallet connection failed');
-    console.error("Connect Wallet Error", err);
     throw err;
   }
 }
@@ -27,16 +47,8 @@ async function connectWallet() {
 async function mintLicense(cloneName, signer) {
   try {
     const contract = new ethers.Contract(
-      '0x984190d20714618138C8bD1E031C3678FC40dbB0',
-      [
-        {
-          inputs: [{ internalType: 'string', name: 'cloneName', type: 'string' }],
-          name: 'mintLicense',
-          outputs: [],
-          stateMutability: 'payable',
-          type: 'function'
-        }
-      ],
+      CONTRACT_ADDRESS,
+      CONTRACT_ABI,
       signer
     );
     const tx = await contract.mintLicense(cloneName, {
@@ -51,114 +63,144 @@ async function mintLicense(cloneName, signer) {
     });
   } catch (err) {
     toast.error('Mint failed');
-    console.error("Mint License Error", err);
+    console.error(err);
   }
 }
 
-async function logFallbackHit(userId) {
-  try {
-    await fetch('https://luxoranova-fallback.firebaseio.com/logs.json', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, timestamp: new Date().toISOString() })
-    });
-  } catch (err) {
-    console.warn('Failed to log fallback hit:', err);
-  }
-}
-
-export default function HydratedParamsPage() {
-  const rawParams = useParams();
+export default function Page() {
   const router = useRouter();
+  const [repoUrl, setRepoUrl] = useState('');
+  const [generatedCopy, setGeneratedCopy] = useState(null);
+  const [generatedHtml, setGeneratedHtml] = useState('');
+  const [loading, setLoading] = useState(false);
+   const [autopilotEnabled, setAutopilotEnabled] = useState(false);
+    const [campaignName, setCampaignName] = useState('');
+    const [campaignContent, setCampaignContent] = useState('');
 
-  const params = useMemo(() => {
-    return rawParams && typeof rawParams === 'object' ? { ...rawParams } : {};
-  }, [rawParams]);
+  const handleAddButler = () => {
+      // setTeamButlers([...teamButlers, { id: teamButlers.length + 1, name: 'New Butler', tasks: '', performance: '0%' }]);
+   };
 
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [invalid, setInvalid] = useState(false);
+  const handleCampaignLaunch = () => {
+       // alert(`Launching campaign "${campaignName}" with content: ${campaignContent}`);
+   };
 
-  useEffect(() => {
-      const fetchUserData = async () => {
-        try {
-          const userId = params?.userId;
+  const handleAnalyzeRepository = async () => {
+    setIsAnalyzing(true);
 
-          if (!userId || typeof userId !== 'string' || (!isUUID(userId) && !isSlug(userId))) {
-            console.warn("Invalid userId:", userId);
-            setInvalid(true);
-            return;
-          }
+    // Simulate some async operation.
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setGeneratedCopy({
+        headline: 'Headline',
+        subheadline: 'Subheadline',
+        featureDescriptions: ['Description 1', 'Description 2', 'Description 3'],
+        callToAction: 'Call to action'
+      });
+    }, 1500);
+  };
 
-          const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
+   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+   const [isSyndicateDialogOpen, setIsSyndicateDialogOpen] = useState(false);
+   const [syndicateName, setSyndicateName] = useState('');
+   const [syndicateDescription, setSyndicateDescription] = useState('');
 
-          const res = await fetch(`/api/users/${userLabel}`);
-
-          if (!res.ok) {
-            console.error(`Failed to fetch user data: ${res.status} ${res.statusText}`);
-            throw new Error('User not found');
-          }
-
-          const data = await res.json();
-          setUserData(data);
-        } catch (error) {
-          console.error("API fetch failed:", error);
-          setUserData(null);
-          setInvalid(true);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      if (params?.userId) {
-        fetchUserData();
-      }
-    }, [params, router]);
-
-  if (invalid) return <FallbackView />;
-
-  if (loading) {
-    return (
-      <div className="p-8 text-center text-gray-500 animate-pulse">
-        <div className="h-6 w-48 bg-gray-300 rounded mb-4 mx-auto" />
-        <div className="space-y-2">
-          <div className="h-4 w-full bg-gray-200 rounded" />
-          <div className="h-4 w-full bg-gray-200 rounded" />
-          <div className="h-4 w-5/6 bg-gray-200 rounded" />
-        </div>
-      </div>
-    );
+  const handleGenerateCopy = async () => {
+    // Simulate generating copy and enabling "Generate HTML" button
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate async
+    toast({
+      title: "Copy generated!",
+      description: "Landing page copy generated. Now you can generate HTML"
+    });
   }
+
+  const handleCreateSyndicate = () => {
+    // TODO: Implement syndicate creation logic (API call)
+    console.log(`Creating syndicate with name: ${syndicateName} and description: ${syndicateDescription}`);
+    setIsSyndicateDialogOpen(false);
+};
+
+    const mintClone = async () => {
+        try {
+            const signer = await connectWallet();
+            await mintLicense("AI Scheduler", signer);
+        } catch (e) {
+            console.error("Minting process failed", e);
+        }
+    };
+
+  const handleGenerateHTML = async () => {
+    setIsGeneratingHtml(true);
+
+    // Simulate some async operation.
+    setTimeout(() => {
+      setIsGeneratingHtml(false);
+      setGeneratedHtml('HTML Code Generated!');
+    }, 1500);
+  };
+
+  const [isGeneratingHtml, setIsGeneratingHtml] = useState(false);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "HTML copied to clipboard!",
+      description: "The generated html has been copied."
+    });
+  };
 
   return (
-    <motion.div className="p-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-      <h1 className="text-xl font-bold">User Profile</h1>
-      <button onClick={async () => {
-        try {
-          const signer = await connectWallet();
-          await mintLicense(userData?.name || 'AI Scheduler', signer);
-        } catch (e) {
-          console.error("Minting process failed", e);
-        }
-      }} className="bg-indigo-600 text-white px-4 py-2 rounded mb-4">Mint License</button>
-      <div className="bg-white rounded-xl shadow p-6 mt-4 text-left space-y-2">
-        <div><strong>Name:</strong> {userData?.name || ''}</div>
-        <div><strong>Email:</strong> {userData?.email || 'Not available'}</div>
-        <div><strong>Bio:</strong> {userData?.bio || 'No bio available'}</div>
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="z-10 w-full max-w-5xl font-mono text-sm lg:flex flex-col gap-4 items-center">
+        <h1 className="text-3xl font-bold text-center">
+          SaaS Landing Page Generator
+        </h1>
+              <div>
+          <Link href="/">
+             <Button>
+                Home
+             </Button>
+          </Link>
+               </div>
+<Dialog open={isSyndicateDialogOpen} onOpenChange={setIsSyndicateDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>Create Syndicate</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>Create New Syndicate</DialogTitle>
+                            <DialogDescription>
+                                Enter the details for your new investment syndicate.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="name" className="text-right">
+                                    Syndicate Name
+                                </Label>
+                                <Input
+                                    id="name"
+                                    value={syndicateName}
+                                    onChange={(e) => setSyndicateName(e.target.value)}
+                                    className="col-span-3"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="description" className="text-right">
+                                    Description
+                                </Label>
+                                <Input
+                                    id="description"
+                                    value={syndicateDescription}
+                                    onChange={(e) => setSyndicateDescription(e.target.value)}
+                                    className="col-span-3"
+                                />
+                            </div>
+                        </div>
+                        <Button onClick={handleCreateSyndicate}>Create syndicate</Button>
+                    </DialogContent>
+                </Dialog>
       </div>
-    </motion.div>
+    </main>
   );
-}
-
-export async function generateStaticParams() {
-  return [];
-}
-
-export async function notFound() {
-  return {
-    redirect: {
-      destination: '/404',
-      permanent: false
-    }
-  };
 }
