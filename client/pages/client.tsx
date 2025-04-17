@@ -1,3 +1,4 @@
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Dashboard from '../components/Dashboard';
@@ -124,7 +125,7 @@ const ClientDashboard: React.FC = () => {
               {/* User Onboarding Simulation */}
               <div className="bg-white p-4 rounded shadow mt-4">
                   <h3>Simulate User Onboarding:</h3>
-                  <button className="bg-green-500 text-white rounded p-2">Onboard Me!</button>
+                  <button className="bg-green-500 text-white rounded p-2">Onboard Me!</Button>
               </div>
 
               {/* Lead Capture Form Simulation */}
@@ -152,3 +153,4 @@ const ClientDashboard: React.FC = () => {
 };
 
 export default ClientDashboard;
+
