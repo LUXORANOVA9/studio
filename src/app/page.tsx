@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ethers } from 'ethers';
 import { isUUID, isSlug, slugToTitle } from '../lib/utils';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -18,6 +17,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { ethers } from 'ethers';
 
 const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
 const CONTRACT_ABI = [
@@ -37,34 +37,31 @@ async function connectWallet() {
       method: 'wallet_switchEthereumChain',
       params: [{ chainId }]
     });
-    toast.success('Connected to Mumbai');
-    return new ethers.providers.Web3Provider(window.ethereum).getSigner();
-  } catch (err) {
-    toast.error('Wallet connection failed');
-    throw err;
-  }
-}
-
-async function mintLicense(cloneName, signer) {
-  try {
-    const contract = new ethers.Contract(
-      CONTRACT_ADDRESS,
-      CONTRACT_ABI,
-      signer
-    );
-    const tx = await contract.mintLicense(cloneName, {
-      value: ethers.utils.parseEther('0.01')
-    });
-    await tx.wait();
-    toast.success('License Minted!');
-    await fetch('https://luxoranova-fallback.firebaseio.com/mints.json', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cloneName, txHash: tx.hash, time: new Date().toISOString() })
-    });
-  } catch (err) {
-    toast.error('Mint failed');
-    console.error(err);
+  } catch (switchError) {
+    if (switchError.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x13881',
+              chainName: 'Polygon Mumbai Testnet',
+              nativeCurrency: {
+                name: 'MATIC',
+                symbol: 'MATIC',
+                decimals: 18
+              },
+              rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+              blockExplorerUrls: ['https://mumbai.polygonscan.com/']
+            }
+          ]
+        });
+      } catch (addError) {
+        console.error('Failed to add Polygon Mumbai network', addError);
+      }
+    } else {
+      console.error('Failed to switch to the network', switchError.message);
+    }
   }
 }
 
@@ -77,6 +74,8 @@ export default function Page() {
    const [autopilotEnabled, setAutopilotEnabled] = useState(false);
     const [campaignName, setCampaignName] = useState('');
     const [campaignContent, setCampaignContent] = useState('');
+
+  const {toast} = useToast()
 
   const handleAddButler = () => {
       // setTeamButlers([...teamButlers, { id: teamButlers.length + 1, name: 'New Butler', tasks: '', performance: '0%' }]);
@@ -101,7 +100,7 @@ export default function Page() {
     }, 1500);
   };
 
-   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+   const [isAnalyzing, setIsAnalyzing] = useState(false);
    const [isSyndicateDialogOpen, setIsSyndicateDialogOpen] = useState(false);
    const [syndicateName, setSyndicateName] = useState('');
    const [syndicateDescription, setSyndicateDescription] = useState('');
@@ -166,10 +165,6 @@ export default function Page() {
           SaaS Landing Page Generator
         </h1>
 
-        
-          
-             Home
-          
         
 
         {/* Create Syndicate Button and Dialog */}
