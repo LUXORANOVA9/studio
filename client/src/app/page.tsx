@@ -2,8 +2,8 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import Sidebar from '../components/Sidebar'; // Adjust path as needed
-import Card from '../components/Card';     // Adjust path as needed
+import Sidebar from '../components/Sidebar'; // Corrected path
+import Card from '../components/Card';     // Corrected path
 
 // This is the standard way to define a Page component in Next.js App Router
 // It receives searchParams as a prop automatically.
