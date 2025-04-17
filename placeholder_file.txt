@@ -1,2 +1,2 @@
-This is a placeholder for the actual content.
-Please replace this with the real code that implements the changes.
+// Note how `components/MyComponent` exists but `Mycomponent` without the capital `c` is imported
+import MyComponent from '../components/MyComponent'
