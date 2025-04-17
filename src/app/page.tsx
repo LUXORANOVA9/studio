@@ -86,11 +86,9 @@ export default function HydratedParamsPage() {
       const timer = setTimeout(() => router.push('/'), 10000);
       return () => clearTimeout(timer);
     }
-
-    // Simulate API failure by overriding the fetch function
-    const fetch = () => Promise.reject(new Error("Simulated API failure"));
-      
     const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
+    const fetch = () => Promise.reject(new Error("Simulated API failure"));
+
     fetch(`/api/users/fail_${userLabel}`)
       .then((res) => {
         if (!res.ok) throw new Error('Simulated failure');
@@ -108,7 +106,7 @@ export default function HydratedParamsPage() {
   if (invalid) {
     return (
       <motion.div className="p-8 text-center text-red-500" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <motion.img src="/logo.svg" alt="LuxoraNova Logo" className="mx-auto mb-4 w-24 h-24" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5 }} />
+        <motion.img src="/assets/brand-logo.svg" alt="LuxoraNova Logo" className="mx-auto mb-4 w-24 h-24" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5 }} />
         Invalid or Missing User ID
         <div className="mt-4">
           <button onClick={() => router.push('/')} className="bg-gradient-to-r from-yellow-500 to-yellow-300 text-black px-5 py-2 rounded-lg shadow-md hover:opacity-90 mr-2">Go Home</button>
