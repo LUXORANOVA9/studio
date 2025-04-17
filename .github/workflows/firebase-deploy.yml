@@ -1,33 +1,79 @@
-name: Deploy to Firebase Hosting
+name: LuxoraNova CI Pipeline
 
 on:
   push:
-    branches:
-      - main-staging
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build_and_deploy:
+  frontend-tests:
+    name: 🧪 Cypress UI Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: |
-          cd client
-          npm install
-      - name: Lint code
-        run: |
-          cd client
-          npm run lint
-      - name: Build code
-        run: |
-          cd client
-          npm run build
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/github-action-hosting-deploy@v0
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LUXORANOVA9 }}'
-          channelId: live
-          projectId: luxoranova9
+          node-version: '18'
+      - name: Install deps & build
+        run: |
+          npm install
+          npm run build
+      - name: Run Cypress
+        uses: cypress-io/github-action@v5
+        with:
+          start: npm run dev
+          wait-on: http://localhost:3000
+
+  contract-tests:
+    name: 🔐 Foundry Smart Contract Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Foundry
+        run: |
+          curl -L https://foundry.paradigm.xyz | bash
+          source ~/.bashrc
+          foundryup
+      - name: Run Forge Tests
+        run: |
+          cd contracts
+          forge install
+          forge build
+          forge test -vvvv
+
+  deploy-preview:
+    name: 🚀 Deploy Vercel Preview
+    needs: [frontend-tests, contract-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: '${{ secrets.VERCEL_TOKEN }}'
+          vercel-org-id: '${{ secrets.VERCEL_ORG_ID }}'
+          vercel-project-id: '${{ secrets.VERCEL_PROJECT_ID }}'
+          vercel-args: '--prod'
         env:
-          FIREBASE_CLI_PREVIEWS: hostingchannels
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+  deploy-firebase:
+    name: 🔥 Deploy to Firebase Hosting
+    needs: [frontend-tests, contract-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install deps
+        run: npm install
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+      - name: Deploy to Firebase
+        run: |
+          npm run build
+          firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
