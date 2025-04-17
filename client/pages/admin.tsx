@@ -1,76 +1,79 @@
+'use client';
 
-import React, { useState, useEffect } from 'react';
-import Dashboard from '../components/Dashboard';
-import { generateResponse } from '@/ai/luxbot';
-import { analyzeMarketSentiment } from '@/ai/sora';
-import { useAuth } from '../components/AuthContext'; // Import useAuth hook
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, {useState, useEffect} from 'react';
+import { FirebaseApp, initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card"
 
-const AdminDashboard: React.FC = () => {
-    const [luxBotResponse, setLuxBotResponse] = useState<string>('');
-    const [soraAnalysis, setSoraAnalysis] = useState<string>('');
-    const { userRole, loading } = useAuth(); // Use the useAuth hook
-    const router = useRouter();
-    const [versionLogs, setVersionLogs] = useState<string>('');
+const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+let firebaseApp;
+if (!getApps().length) {
+    firebaseApp = initializeApp(firebaseConfig);
+} else {
+    firebaseApp = getApps()[0];
+}
+
+const db = getFirestore(firebaseApp);
+
+export default function Admin() {
+    const [mintLogs, setMintLogs] = useState([]);
 
     useEffect(() => {
-        if (!loading && userRole !== 'admin' && userRole !== 'superadmin') {
-            router.push('/'); // Redirect if not authorized
-        }
-    }, [userRole, loading, router]);
-
-    useEffect(() => {
-        const fetchLuxBotResponse = async () => {
-            const response = await generateResponse("Summarize key metrics for Admin.");
-            setLuxBotResponse(response);
-        };
-
-        const fetchSoraAnalysis = async () => {
-            const analysis = await analyzeMarketSentiment("Provide a risk management analysis for the next month.");
-            setSoraAnalysis(analysis);
-        };
-
-        const fetchVersionLogs = async () => {
-          // Replace with your actual version log retrieval logic
-          // This could involve reading a file, calling an API, etc.
-          const logs = "v1.0: Initial release\nv1.1: Added SORA AI integration\nv1.2: Improved LUXBot performance";
-          setVersionLogs(logs);
-        };
-
-        fetchLuxBotResponse();
-        fetchSoraAnalysis();
-        fetchVersionLogs();
+        loadMintLogs();
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>; // Loading state
+    async function loadMintLogs() {
+        const logsRef = collection(db, "mint_logs");
+        const q = query(logsRef, orderBy("mintedAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        const logs = [];
+
+        querySnapshot.forEach(doc => {
+            logs.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        setMintLogs(logs);
     }
 
     return (
-        <Dashboard>
-            <div className="bg-white p-4 rounded shadow">
-                <h2>Admin Specific Content</h2>
-                <p>Manage users, view analytics, etc.</p>
-            </div>
-            <div className="bg-white p-4 rounded shadow mt-4">
-                <h3>LUXBot Response:</h3>
-                <p>{luxBotResponse || 'Loading LUXBot response...'}</p>
-            </div>
-            <div className="bg-white p-4 rounded shadow mt-4">
-                <h3>SORA AI Analysis:</h3>
-                <p>{soraAnalysis || 'Loading SORA AI analysis...'}</p>
-            </div>
-            <Card className="w-full mt-4">
-              <CardHeader>
-                <CardTitle>Version Comparison Logs</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <pre className="whitespace-pre-wrap">{versionLogs || 'Loading version logs...'}</pre>
-              </CardContent>
+       <div className="p-6">
+            <Card className="w-full">
+                <CardHeader>
+                    <CardTitle>Mint Logs - Admin View</CardTitle>
+                    <CardDescription>Shows log of all minted scrolls. (wallet, txHash, timestamp)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <table className="w-full">
+                        <thead>
+                        <tr>
+                            <th className="text-left">Wallet</th>
+                            <th className="text-left">Transaction Hash</th>
+                            <th className="text-left">Timestamp</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {mintLogs.map(log => (
+                            <tr key={log.id}>
+                                <td>{log.wallet}</td>
+                                <td>{log.txHash}</td>
+                                <td>{log.mintedAt?.toDate().toLocaleString()}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </CardContent>
             </Card>
-        </Dashboard>
+        </div>
     );
-};
-
-export default AdminDashboard;
+}
