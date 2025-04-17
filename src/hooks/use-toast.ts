@@ -1,5 +1,16 @@
-import React from 'react';
+'use client'
 
-export default function MyComponent() {
-  return <h1>Hello</h1>
+import * as React from "react"
+
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
+
+export function ToastDemo() {
+  const { toast } = useToast()
+
+  return (
+    
+      Add to portfolio
+    
+  )
 }

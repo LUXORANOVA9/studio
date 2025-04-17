@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { isUUID, isSlug, slugToTitle } from '../lib/utils';
-import { toast } from '@/components/ui/use-toast'
+import { useToast } from '@/hooks/use-toast';
 import { ethers } from 'ethers';
 
 async function connectWallet() {
@@ -14,10 +14,9 @@ async function connectWallet() {
       method: 'wallet_switchEthereumChain',
       params: [{ chainId }]
     });
-    toast.success('Connected to Mumbai');
     return new ethers.providers.Web3Provider(window.ethereum).getSigner();
   } catch (err) {
-    toast.error('Wallet connection failed');
+    console.error("Wallet connection failed:", err);
     throw err;
   }
 }
@@ -41,14 +40,14 @@ async function mintLicense(cloneName, signer) {
       value: ethers.utils.parseEther('0.01')
     });
     await tx.wait();
-    toast.success('License Minted!');
+    // toast.success('License Minted!');
     await fetch('https://luxoranova-fallback.firebaseio.com/mints.json', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cloneName, txHash: tx.hash, time: new Date().toISOString() })
     });
   } catch (err) {
-    toast.error('Mint failed');
+    // toast.error('Mint failed');
     console.error(err);
   }
 }
@@ -73,6 +72,7 @@ export default function HydratedParamsPage() {
   const [fallbackData] = useState({ name: 'Unknown User', bio: 'No data available.' });
   const [loading, setLoading] = useState(true);
   const [invalid, setInvalid] = useState(false);
+   const { toast } = useToast()
 
   useEffect(() => {
     if (!params || !params.userId) {
@@ -99,7 +99,7 @@ export default function HydratedParamsPage() {
         logFallbackHit(userLabel);
       })
       .finally(() => setLoading(false));
-  }, [params, router]);
+  }, [params, router, toast]);
 
   if (invalid) {
     return (
