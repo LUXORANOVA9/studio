@@ -58,7 +58,8 @@
     "zod": "^3.24.2",
     "openai": "*",
     "@google/generative-ai": "*",
-    "framer-motion": "*"
+    "framer-motion": "*",
+    "react-hot-toast": "*"
   },
   "devDependencies": {
     "@types/node": "^20",
