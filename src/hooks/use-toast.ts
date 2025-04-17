@@ -9,8 +9,8 @@ export function ToastDemo() {
   const { toast } = useToast()
 
   return (
-    
-      Add to portfolio
-    
+    <>
+      <span>Add to portfolio</span>
+    </>
   )
 }
