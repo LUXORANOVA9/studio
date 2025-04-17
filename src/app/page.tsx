@@ -2,116 +2,201 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from '@/hooks/use-toast';
+import {Copy, RefreshCw} from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {Github} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form"
+import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import React from "react"
+import { motion } from "framer-motion";
 
-function isUUID(str) {
-  return typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-}
+const formSchema = z.object({
+  username: z.string().min(2, {
+    message: "Username must be at least 2 characters.",
+  }),
+})
 
-function isSlug(str) {
-  return typeof str === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(str);
-}
+async function copyText(textToCopy) {
+  if (!navigator.clipboard) {
+    return alert('Clipboard not supported')
+  }
 
-function slugToTitle(slug) {
-  return typeof slug === 'string'
-    ? slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-    : '';
-}
-
-async function connectWallet() {
   try {
-    const chainId = '0x13881';
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId }]
-    });
-  } catch (switchError) {
-    if (switchError.code === 4902) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x13881',
-              chainName: 'Polygon Mumbai Testnet',
-              nativeCurrency: {
-                name: 'MATIC',
-                symbol: 'MATIC',
-                decimals: 18
-              },
-              rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
-              blockExplorerUrls: ['https://mumbai.polygonscan.com/']
-            }
-          ]
-        });
-      } catch (addError) {
-        console.error('Failed to add Polygon Mumbai network', addError);
-      }
-    } else {
-      console.error('Failed to switch to the network', switchError.message);
-    }
+    await navigator.clipboard.writeText(textToCopy)
+    toast({
+      title: "Copied!",
+      description: "URL copied to clipboard."
+    })
+  } catch (error) {
+    console.log("ERR", error)
+    return alert('Copy failed')
   }
 }
 
-export default function HydratedParamsPage() {
-  const rawParams = useParams();
-  const router = useRouter();
-
-  const params = useMemo(() => {
-    return rawParams && typeof rawParams === 'object' ? { ...rawParams } : {};
-  }, [rawParams]);
-
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [invalid, setInvalid] = useState(false);
-
-  useEffect(() => {
-    const userId = params?.userId;
-
-    if (!userId || typeof userId !== 'string' || (!isUUID(userId) && !isSlug(userId))) {
-      console.warn("Invalid userId:", userId);
-      setInvalid(true);
-      return;
-    }
-
-    const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
-
-    fetch(`/api/users/${userLabel}?fail=true`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Not found');
-        return res.json();
-      })
-      .then((data) => setUserData(data))
-      .catch(() => setInvalid(true))
-      .finally(() => setLoading(false));
-  }, [params]);
-
-  if (invalid) return <div className="p-8 text-center text-red-500">Invalid or Missing User ID</div>;
-  if (loading) return <div className="p-8 text-center">Loading user...</div>;
-
-  return (
-    <div className="p-8">
-      <h1 className="text-xl font-bold">User Profile</h1>
-      <button onClick={connectWallet} className="bg-indigo-600 text-white px-4 py-2 rounded mb-4">Connect Wallet</button>
-      {userData ? (
-        <pre className="bg-gray-100 p-4 rounded text-sm mt-2">
-          {JSON.stringify(userData, null, 2)}
-        </pre>
-      ) : (
-        <div className="text-red-500">User Not Found</div>
-      )}
-    </div>
+async function generateOpenGraphImage() {
+  const response = await fetch(
+    `/api/og?title=${encodeURIComponent('asdf')}`
   );
+
+  if (response.ok) {
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+  }
 }
 
-export async function generateStaticParams() {
-  return [];
-}
+export default function Page() {
+  const [repoUrl, setRepoUrl] = React.useState('');
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [generatedCopy, setGeneratedCopy] = React.useState(null);
+  const [generatedHtml, setGeneratedHtml] = React.useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [isGeneratingHtml, setIsGeneratingHtml] = React.useState(false);
+  const [regenerateHeadlineLoading, setRegenerateHeadlineLoading] = React.useState(false);
 
-export async function notFound() {
-  return {
-    redirect: {
-      destination: '/404',
-      permanent: false
+  const handleUrlChange = (event) => {
+    setRepoUrl(event.target.value);
+  };
+
+  const handleAnalyzeRepository = async () => {
+    setIsAnalyzing(true);
+
+    // Simulate some async operation.
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setGeneratedCopy({
+        headline: 'Headline',
+        subheadline: 'Subheadline',
+        featureDescriptions: ['Description 1', 'Description 2', 'Description 3'],
+        callToAction: 'Call to action'
+      });
+    }, 1500);
+  };
+
+  const handleGenerateCopy = async () => {
+    // Simulate generating copy and enabling "Generate HTML" button
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate async
+    toast({
+      title: "Copy generated!",
+      description: "Landing page copy generated. Now you can generate HTML"
+    });
+  }
+
+  const handleRegenerateHeadline = async () => {
+    setRegenerateHeadlineLoading(true);
+    try {
+      // Simulate generating new headline (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Here you would update the headline state with the new value
+      toast({
+        title: "New headline generated!",
+        description: "A new headline has been generated",
+      });
+    } finally {
+      setRegenerateHeadlineLoading(false);
     }
   };
+
+  const handleGenerateHTML = async () => {
+    setIsGeneratingHtml(true);
+
+    // Simulate some async operation.
+    setTimeout(() => {
+      setIsGeneratingHtml(false);
+      setGeneratedHtml('HTML Code Generated!');
+    }, 1500);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "HTML copied to clipboard!",
+      description: "The generated html has been copied."
+    });
+  };
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="z-10 w-full max-w-5xl font-mono text-sm lg:flex flex-col gap-4 items-center">
+       <h1 className="text-3xl font-bold text-center">SaaS Landing Page Generator</h1>
+
+
+        <h2 className="text-xl font-semibold text-gray-700 mt-6">
+           Subheadline
+        </h2>
+        <p className="text-base text-gray-500 text-center max-w-xl">
+          Build and deploy beautiful landing pages in seconds with AI-powered templates and one-click integrations.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-8">Feature Descriptions</h3>
+        <ul className="list-disc text-gray-600 pl-5 text-left">
+          <li>Drag & drop builder</li>
+          <li>Mobile-responsive out of the box</li>
+          <li>AI-generated content suggestions</li>
+        </ul>
+
+        
+          Enter your GitHub repository URL to generate a landing page.
+        
+
+        
+          
+            GitHub Repository URL
+          
+        
+
+        
+          Analyze Repository
+        
+
+
+      
+        
+          Subheadline:
+        
+        
+          Feature Descriptions:
+        
+        
+          Call to Action:
+        
+        
+          Generate HTML
+        
+
+
+      
+        
+          Generated HTML
+        
+        
+          Copy HTML
+        
+
+      
+        
+          Regenerate
+        
+      
+    </main>
+  );
 }
