@@ -4,11 +4,11 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 function isUUID(str) {
-  return typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+  return str && typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 }
 
 function isSlug(str) {
-  return typeof str === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(str);
+  return str && typeof str === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(str);
 }
 
 function slugToTitle(slug) {
@@ -65,10 +65,15 @@ export default function HydratedParamsPage() {
   const [invalid, setInvalid] = useState(false);
 
   useEffect(() => {
+    if (!params || !params.userId) {
+      setInvalid(true);
+      return;
+    }
+
     const userId = params?.userId;
 
     if (!userId || typeof userId !== 'string' || (!isUUID(userId) && !isSlug(userId))) {
-      console.warn("Invalid userId:", userId);
+      console.warn("Invalid or missing userId:", userId);
       setInvalid(true);
       const timer = setTimeout(() => router.push('/'), 10000);
       return () => clearTimeout(timer);
