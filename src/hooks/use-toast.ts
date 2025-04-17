@@ -2,14 +2,9 @@
 
 import * as React from "react"
 
-import { useToast } from "@/components/ui/use-toast"
+import { useToast as useShadcnToast } from "@/components/ui/use-toast"
 
-export function ToastDemo() {
-  const { toast } = useToast()
-
-  return (
-    <>
-      <span>Add to portfolio</span>
-    </>
-  )
+export function useToast() {
+  const { toast } = useShadcnToast()
+  return { toast }
 }
