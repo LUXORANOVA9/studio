@@ -1,15 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { toast } from '@/hooks/use-toast';
-import { Copy, RefreshCw } from 'lucide-react';
-import { useCopyToClipboard } from 'usehooks-ts';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Github } from 'lucide-react';
 
 const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
 const CONTRACT_ABI = [
@@ -44,11 +40,6 @@ export default function Page() {
   const [walletAddress, setWalletAddress] = useState("");
   const [minting, setMinting] = useState(false);
   const [networkError, setNetworkError] = useState("");
-  const [mintReceiptModalOpen, setMintReceiptModalOpen] = useState(false);
-  const [txHash, setTxHash] = useState("");
-  const [cloneName, setCloneName] = useState("");
-  const [priceInEth, setPriceInEth] = useState("");
-  const [repoUrl, setRepoUrl] = useState('');
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -64,16 +55,29 @@ export default function Page() {
       try {
         const chainId = await window.ethereum.request({ method: "eth_chainId" });
         if (chainId !== "0x13881") {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x13881" }], // Polygon Mumbai
-          });
+          try {
+            await window.ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: "0x13881" }], // Polygon Mumbai
+            });
+          } catch (switchError: any) {
+            // This error code indicates that the chain has not been added to MetaMask.
+            if (switchError.code === 4902) {
+              alert("Please add Polygon Mumbai to your MetaMask");
+            }
+            console.error("Failed to switch to the network", switchError);
+            return;
+          }
         }
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         setWalletAddress(accounts[0]);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Wallet connection failed:", err);
-        alert("Wallet connection failed. Check console for details.");
+        if (err.code === 4001) {
+          alert("User denied account access!");
+        } else {
+          alert("Wallet connection failed. Check console for details.");
+        }
       }
     } else {
       alert("Please install MetaMask or a Web3 wallet to continue.");
@@ -98,16 +102,12 @@ export default function Page() {
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       const tx = await contract.mintLicense(cloneName);
       console.log("Transaction sent:", tx.hash);
-      setTxHash(tx.hash);
-      setCloneName(cloneName);
-      setPriceInEth("100"); // Replace with actual price fetching
       await tx.wait();
       console.log("Transaction confirmed.");
       toast({
         title: "Success",
         description: `${cloneName} license minted successfully!`,
       });
-      setMintReceiptModalOpen(true);
     } catch (err) {
       console.error("Minting failed:", err);
       toast({
