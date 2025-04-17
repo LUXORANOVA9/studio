@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from "react"
 
 import { useToast as useShadcnToast } from "@/components/ui/use-toast"
