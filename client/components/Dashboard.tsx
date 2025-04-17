@@ -71,36 +71,24 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
                 </div>
             )}
 
-            {/* LuxVerse Link */}
-            {(userRole === 'broker' || userRole === 'admin' || userRole === 'superadmin' || userRole === 'client') && (
-                <div className="mb-4">
-                    <Link href="/luxverse">
-                        <Button>
-                            Enter LuxVerse
-                        </Button>
-                    </Link>
-                </div>
-            )}
-             {/* Saas Landing Page Generator Link */}
-             <div className="mb-4">
-                <Link href="/">
-                   <Button>
-                      Landing Page Generator
-                   </Button>
-                </Link>
-             </div>
-
-            {/* Android App Download Link (Visible to all roles) */}
-            <div className="mb-4">
-                <a href="https://example.com/luxoranova.apk" target="_blank" rel="noopener noreferrer">
-                    <Button>
-                        Download Android App
-                    </Button>
-                </a>
-                <p className="text-sm text-gray-500">
-                  Download the LuxoraNova Android App for mobile access.
-                  </p>
-            </div>
+              {/* LuxVerse Link */}
+              {(userRole === 'broker' || userRole === 'admin' || userRole === 'superadmin' || userRole === 'client') && (
+                  <div className="mb-4">
+                      <Link href="/luxverse">
+                          <Button>
+                              Enter LuxVerse
+                          </Button>
+                      </Link>
+                  </div>
+              )}
+               {/* Saas Landing Page Generator Link */}
+               <div className="mb-4">
+                  <Link href="/">
+                     <Button>
+                        Landing Page Generator
+                     </Button>
+                  </Link>
+               </div>
 
             {children}
         </div>
@@ -108,3 +96,4 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
 };
 
 export default Dashboard;
+
