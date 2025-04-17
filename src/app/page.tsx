@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { isUUID, isSlug, slugToTitle } from '../lib/utils';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
 
 async function connectWallet() {
@@ -86,6 +86,10 @@ export default function HydratedParamsPage() {
       const timer = setTimeout(() => router.push('/'), 10000);
       return () => clearTimeout(timer);
     }
+
+    // Simulate API failure by overriding the fetch function
+    const fetch = () => Promise.reject(new Error("Simulated API failure"));
+      
     const userLabel = isUUID(userId) ? userId : slugToTitle(userId);
     fetch(`/api/users/fail_${userLabel}`)
       .then((res) => {
