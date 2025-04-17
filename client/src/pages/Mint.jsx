@@ -14,6 +14,8 @@ import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { useAuth } from '../components/AuthContext'; // Import useAuth hook
 
+const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
+
 // Firebase configuration
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -86,7 +88,7 @@ export default function Mint() {
     };
 
     const mintScroll = async () => {
-        const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+        const contractAddress = CONTRACT_ADDRESS;
         const contractABI = []; //  *REPLACE WITH YOUR ACTUAL CONTRACT ABI*
 
         if (window.ethereum) {
@@ -129,4 +131,3 @@ export default function Mint() {
         </div>
     );
 }
-

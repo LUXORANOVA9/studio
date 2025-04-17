@@ -3,8 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
+import { toast } from '@/hooks/use-toast';
+import { Copy, RefreshCw } from 'lucide-react';
+import { useCopyToClipboard } from 'usehooks-ts';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Github } from 'lucide-react';
 
 const CONTRACT_ADDRESS = "0x984190d20714618138C8bD1E031C3678FC40dbB0";
 const CONTRACT_ABI = [
@@ -39,6 +44,12 @@ export default function Page() {
   const [walletAddress, setWalletAddress] = useState("");
   const [minting, setMinting] = useState(false);
   const [networkError, setNetworkError] = useState("");
+  const [mintReceiptModalOpen, setMintReceiptModalOpen] = useState(false);
+  const [txHash, setTxHash] = useState("");
+  const [cloneName, setCloneName] = useState("");
+  const [priceInEth, setPriceInEth] = useState("");
+  const [repoUrl, setRepoUrl] = useState('');
+  const [value, copy] = useCopyToClipboard();
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -71,29 +82,39 @@ export default function Page() {
   };
 
   const handleMint = async (cloneName) => {
-    if (!walletAddress) return alert("Connect your wallet first");
+    if (!walletAddress) {
+      toast({
+        title: "Error",
+        description: "Connect your wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setMinting(true);
       console.log(`Minting clone: ${cloneName}`);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x13881' }],
-      });
       const tx = await contract.mintLicense(cloneName);
       console.log("Transaction sent:", tx.hash);
+      setTxHash(tx.hash);
+      setCloneName(cloneName);
+      setPriceInEth("100"); // Replace with actual price fetching
       await tx.wait();
-      await addDoc(collection(db, "mintedClones"), {
-        wallet: walletAddress,
-        clone: cloneName,
-        timestamp: new Date().toISOString()
+      console.log("Transaction confirmed.");
+      toast({
+        title: "Success",
+        description: `${cloneName} license minted successfully!`,
       });
-      alert(`${cloneName} license minted & saved to Firestore!`);
     } catch (err) {
       console.error("Minting failed:", err);
-      alert("Minting failed. Check console for details.");
+      toast({
+        title: "Error",
+        description: "Minting failed. Check console for details.",
+        variant: "destructive",
+      });
     } finally {
       setMinting(false);
     }
@@ -101,7 +122,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#0e0e2c] via-[#1c1246] to-[#240b36] text-white font-sans px-6 py-16 flex flex-col items-center">
-      <section className="max-w-4xl text-center">
+      <div className="max-w-4xl text-center">
         <img
           src="/logo.svg"
           alt="LuxoraNova Logo"
@@ -130,7 +151,7 @@ export default function Page() {
         <div className="mt-12 text-sm text-gray-500">
           Powered by <span className="text-white font-semibold">LuxoraNova</span> | LUXBot Engine | Web3 Ready
         </div>
-      </section>
+      </div>
 
       {/* Scrollstorm Clone Store Preview */}
       <section className="w-full mt-24 px-4 md:px-16">
@@ -167,11 +188,11 @@ export default function Page() {
       </section>
 
       {/* Floating LUXBot */}
-      <aside className="fixed bottom-6 right-6 animate-fade-in">
+      <div className="fixed bottom-6 right-6 animate-fade-in">
         <button className="bg-[#ffeb3b] text-black px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform">
           💬 Ask LUXBot
         </button>
-      </aside>
+      </div>
     </main>
   );
 }
