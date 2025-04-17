@@ -1,8 +1,9 @@
-import * as React from "react"
+import * as React from "react";
 
-import { useToast as useShadcnToast } from "@/components/ui/toaster"
+import { useToast as useShadcnToast } from "@/components/ui/toaster";
 
 export function useToast() {
-  const { toast } = useShadcnToast()
-  return { toast }
+  const { toast } = useShadcnToast();
+
+  return { toast };
 }
