@@ -67,8 +67,16 @@ export default function Page() {
         if (chainId !== "0x13881") {
           try {
             await window.ethereum.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: "0x13881" }], // Polygon Mumbai
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x13881',
+                  chainName: 'Polygon Mumbai Testnet',
+                  nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+                  rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+                  blockExplorerUrls: ['https://mumbai.polygonscan.com/']
+                }
+              ]
             });
           } catch (switchError: any) {
             // This error code indicates that the chain has not been added to MetaMask.
