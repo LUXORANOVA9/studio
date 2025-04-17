@@ -1,0 +1,22 @@
+name: Sync Cloud Workstation as Runner
+
+description: "Bind current cloud workstation to GitHub Actions CI system"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install GitHub Actions Runner
+      shell: bash
+      run: |
+        mkdir actions-runner && cd actions-runner
+        curl -o actions-runner-linux-x64-2.308.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.308.0/actions-runner-linux-x64-2.308.0.tar.gz
+        tar xzf ./actions-runner-linux-x64-2.308.0.tar.gz
+
+    - name: Configure Runner
+      shell: bash
+      run: |
+        ./config.sh --url https://github.com/YOUR_USERNAME/YOUR_REPO --token ${{ secrets.RUNNER_REGISTRATION_TOKEN }} --name cloud-runner --unattended --labels luxoranova,cloud
+
+    - name: Start Runner
+      shell: bash
+      run: ./run.sh
