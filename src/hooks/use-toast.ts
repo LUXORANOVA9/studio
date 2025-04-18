@@ -1,7 +1,6 @@
 import * as React from "react";
 
-// Corrected import path
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast"
 
 export function useToastHook() {
   // Use the toast function from the shadcn/ui hook
