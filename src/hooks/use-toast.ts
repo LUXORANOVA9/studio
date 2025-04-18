@@ -1,10 +1,9 @@
-import * as React from "react";
+import { useCoreToast } from '@/components/ui/toast';
 
-import { useToast } from "@/components/ui/use-toast"
-
+/**
+ * High-level hook for toast notifications.
+ * Returns an object containing `notify` to trigger toasts.
+ */
 export function useToastHook() {
-  // Use the toast function from the shadcn/ui hook
-  const { toast } = useToast();
-
-  return { toast };
+  return useCoreToast();
 }
