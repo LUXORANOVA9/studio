@@ -3,9 +3,9 @@
 import * as React from "react";
 
 // --- Correction is here ---
-// 1. Import `useToast` from the correct path: '@/components/ui/toast'
+// 1. Import `useToast` from the correct path: '@/components/ui/use-toast'
 // 2. Remove the import for `ToastContext` as it's not typically exported or needed here.
-import { useToast as useShadcnToast } from "@/components/ui/toast";
+import { useToast as useShadcnToast } from "@/components/ui/use-toast";
 // --- End of Correction ---
 
 // Renaming the function to `useToast` assuming that's the intended export.
