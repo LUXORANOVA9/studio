@@ -6,7 +6,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@/components/ui/toast/use-toast"
+} from "@/components/ui/toast" // Corrected path
 //import { useToast as useToastOriginal } from "@/hooks/use-toast" // importing here breaks
 // as it creates a circular dependency
 const ToastDemo = () => {
