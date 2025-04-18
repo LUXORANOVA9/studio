@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { isUUID, isSlug, slugToTitle } from '../lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { useToastHook } from '@/hooks/use-toast';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -75,7 +75,7 @@ export default function Page() {
     const [campaignName, setCampaignName] = useState('');
     const [campaignContent, setCampaignContent] = useState('');
 
-  const {toast} = useToast()
+  const { toast } = useToastHook()
 
   const handleAddButler = () => {
       // setTeamButlers([...teamButlers, { id: teamButlers.length + 1, name: 'New Butler', tasks: '', performance: '0%' }]);
