@@ -18,6 +18,7 @@ module.exports = {
   //   '^@/components/(.*)$': '<rootDir>/src/components/$1', // Adjust if your components path is different
   // },
   moduleDirectories: ["node_modules", "<rootDir>"],
+  modulePaths: ['<rootDir>'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'], // Optional: for setup files
   transform: {
     // Use babel-jest to transpile tests with the next/babel preset
