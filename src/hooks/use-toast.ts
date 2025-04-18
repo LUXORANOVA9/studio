@@ -1,8 +1,12 @@
-import * as React from "react"
+import * as React from "react";
 
-import { useToast as useShadcnToast } from "@/components/ui/toast"
+// Import the useToast hook from the Shadcn UI toast component
+import { useToast } from "@/components/ui/toast";
 
 export function useToast() {
-  const { toast } = useShadcnToast()
-  return { toast }
+  // Use the toast function from the shadcn/ui hook
+  const { toast } = useToast();
+
+  // Return the toast function
+  return { toast };
 }
