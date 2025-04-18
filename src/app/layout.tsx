@@ -1,3 +1,11 @@
-export default function MyComponent() {
-  return <h1>Hello</h1>
+import React from 'react';
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        {children}
+      </body>
+    </html>
+  )
 }
