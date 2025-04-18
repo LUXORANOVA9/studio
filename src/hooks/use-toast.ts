@@ -4,7 +4,7 @@ import * as React from "react";
 import {
   useToast as useShadcnToast,
   ToastProps, // Import ToastProps if you need to type the toast function
-} from "@/components/ui/toast/use-toast"; // Correct import path
+} from "@/components/ui/toast"; // Correct import path
 
 export function useToast() {
   const { toast } = useShadcnToast();
