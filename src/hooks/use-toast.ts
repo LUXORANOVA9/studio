@@ -1,5 +1,6 @@
 import * as React from "react";
 
+// Corrected import path
 import {
   useToast as useShadcnToast,
   ToastProps, // Import ToastProps if you need to type the toast function
