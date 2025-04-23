@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
@@ -9,6 +11,7 @@ const whiteLabelRoutes = require('./routes/whiteLabelRoutes'); // Import whiteLa
 const billingRoutes = require('./routes/billingRoutes'); // Import billing routes
 const aiRoutes = require('./routes/aiRoutes'); // Import AI routes
 const mintRoutes = require('./routes/mintRoutes'); // Import mint routes
+const stripeRoutes = require('./routes/stripeRoutes');
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -26,6 +29,7 @@ app.use('/whitelabel', whiteLabelRoutes); // Use whiteLabelRoutes
 app.use('/billing', billingRoutes); // Use billing routes
 app.use('/ai', aiRoutes); // Use AI routes
 app.use('/mint', mintRoutes); // Use mint routes
+app.use('/', stripeRoutes);
 
 app.get('/', (req, res) => {
     res.send('LuxoraNova API is running');
@@ -40,6 +44,20 @@ app.post('/api/track-referral-bonus', (req, res) => {
     // 3. Log the bonus transaction
     console.log(`Simulating awarding ${amount} to referrer ${referralId}`);
     res.status(200).send({ message: 'Referral bonus tracked successfully' });
+});
+
+
+// New route to read a markdown file
+app.post('/api/getMarkdown', (req, res) => {
+    const { path: filePath } = req.body;
+    if (!filePath) {
+        return res.status(400).json({ error: 'File path is required' });
+    }
+    const fullPath = path.join(process.cwd(), filePath);
+    fs.readFile(fullPath, 'utf-8', (err, data) => {
+        if (err) return res.status(500).json({ error: 'Failed to read file' });
+        res.send(data);
+    });
 });
 
 // Webhook endpoints for automation

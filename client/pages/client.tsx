@@ -12,6 +12,7 @@ import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { FirebaseApp, initializeApp, getApps } from 'firebase/app';
 import { Button } from '@/components/ui/button';
 
+import LuxBotCard from '../components/LuxBotCard';
 const ClientDashboard: React.FC = () => {
     const [luxBotResponse, setLuxBotResponse] = useState<string>('');
     const [soraAnalysis, setSoraAnalysis] = useState<string>('');
@@ -45,7 +46,7 @@ const ClientDashboard: React.FC = () => {
         }
     }, [userRole, loading, router]);
 
-    useEffect(() => {
+    useEffect(function () {
         const fetchLuxBotResponse = async () => {
             const response = await generateResponse("Summarize key metrics for Client.");
             setLuxBotResponse(response);
@@ -112,15 +113,7 @@ const ClientDashboard: React.FC = () => {
                 )}
             </div>
               {/* LUXBot Chatbot Simulation */}
-              <div className="bg-white p-4 rounded shadow mt-4">
-                  <h3>Ask LUXBot:</h3>
-                  <input
-                      type="text"
-                      placeholder="Enter your question"
-                      className="w-full border rounded p-2 mb-2"
-                  />
-                  <button className="bg-blue-500 text-white rounded p-2">Ask</button>
-              </div>
+              <LuxBotCard />
 
               {/* User Onboarding Simulation */}
               <div className="bg-white p-4 rounded shadow mt-4">
